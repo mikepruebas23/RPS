@@ -1,0 +1,150 @@
+:root {
+  --color-primario: #1773e4;
+  --color-secundario: #69c300;
+  --color-peligro: #FF4444;
+  --color-texto: #ffffff;
+  --color-texto-disabled: #fdfdfd;
+  --color-fondo: #f2f2f2;
+  --sombra-boton: 0px 2px 0px 0px #000;
+  --color-disabled: #a7a7a7;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  background: var(--color-fondo);
+}
+
+button {
+  margin: 10px;
+  font-size: 16px;
+}
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  margin: 10px;
+}
+
+
+
+#lista-salas {
+  padding: 5px;
+  background: white;
+  width: 50%;
+  margin: 20px auto;
+}
+
+.contenedor-sala {
+  background: var(--color-primario);
+  color: var(--color-texto);
+  padding: 10px;
+}
+
+#movimientos {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  background-color: #606d7b;
+  overflow-x: auto;
+}
+
+#movimientos-container {
+  width: 90%;
+  margin: 10px auto;
+  background: white;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.movimiento {
+  user-select: none;
+  cursor: grab;
+  padding: 14px 35px;
+  border-radius: 5px;
+  background: var(--color-primario);
+  color: var(--color-texto);
+  box-shadow: var(--sombra-boton);
+  border-bottom: 7px solid #125cb7;
+  transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+.boton-sala {
+  cursor: pointer;
+  text-decoration: none;
+  border-width: 1px;
+  padding: 14px 35px;
+  border-radius: 5px;
+  box-shadow: var(--sombra-boton);
+  color: var(--color-texto);
+  transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+.crear-sala {
+  background: var(--color-secundario);
+  border-bottom: 7px solid #539a00;
+}
+
+.crear-sala:hover {
+  background-color: var(--color-secundario);
+  transform: scale(1.04);
+  box-shadow: 0 5px 15px rgba(27, 180, 27, 0.3);
+}
+
+.unirse-sala {
+  background-color: var(--color-peligro);
+  border-bottom: 7px solid #e23b3b;
+}
+
+.unirse-sala:hover {
+  background-color: #FF2222;
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+}
+
+.btn-listo {
+  background-color: var(--color-primario);
+  border-bottom: 7px solid #115db9;
+}
+
+.btn-listo:hover {
+  background-color: var(--color-primario);
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px #115db9;
+}
+
+.btn-disabled {
+  cursor: pointer;
+  text-decoration: none;
+  border-width: 1px;
+  padding: 14px 35px;
+  border-radius: 5px;
+  box-shadow: var(--sombra-boton);
+  color: var(--color-texto-disabled);
+  transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  background-color: var(--color-disabled);
+  border-bottom: 7px solid #7f7f7f;
+}
+
+.mi-turno{
+  background-color: rgb(119, 0, 255);
+}
+.turno-enemigo{
+  background-color: red;
+}
+
+.cont-jugadores, .nombre-jugadores {
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.hidden {
+  display: none;
+}
