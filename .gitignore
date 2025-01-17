@@ -1,0 +1,15 @@
+# Ignorar dependencias
+node_modules/
+
+# Ignorar compilaciones y configuraciones específicas de OS/IDEs
+.env
+.DS_Store
+*.log
+dist/
+.vercel/
+coverage/
+.next/
+
+# Ignorar configuraciones de IDEs
+.vscode/
+.idea/
