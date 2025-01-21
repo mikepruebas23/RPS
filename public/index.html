@@ -4,64 +4,85 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Juego con Sockets</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/pantallaFin.css">
   <!-- CDN de SortableJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 </head>
 <body>
+    <div id="cont-juego" class="cont-juego">
+        <div id="usuario-id" class="info-usuario hidden">
+            <!-- Aquí se mostrará el ID del usuario -->
+        </div>
 
-    <div id="usuario-id" class="info-usuario">
-        <!-- Aquí se mostrará el ID del usuario -->
-    </div>
+        <div id="controles-iniciales" class="_cont-iniciales">
+            <button id="crear" class="crear-sala boton-sala">Crear Sala</button>
+            <!-- <input id="codigo" placeholder="Código de Sala" autocomplete="false"> -->
+            <!-- <button id="unirse" class="unirse-sala boton-sala">Unirse a Sala</button> -->
+        </div>
 
-    <div id="controles-iniciales">
-        <button id="crear" class="crear-sala boton-sala">Crear Sala</button>
-        <input id="codigo" placeholder="Código de Sala" autocomplete="false">
-        <button id="unirse" class="unirse-sala boton-sala">Unirse a Sala</button>
-    </div>
+        <div id="lista-salas">
+            <h2>Salas disponibles:</h2>
+            <div id="contenedor-sala" class="contenedor-sala">
+                <p id="titulo-listado">No hay salas disponibles</p>
+            </div>
+        </div>
 
-    <div id="lista-salas">
-        <h2>Salas disponibles:</h2>
-        <div id="contenedor-sala" class="contenedor-sala">
-            <p id="titulo-listado">No hay salas disponibles</p>
+        <div id="sala-juego" class="hidden">
+            <h2>Bienvenido a la Sala</h2>
+            <p id="info-sala"></p>
+        </div>
+
+        <div id="estado-partida">
+            <!-- Aquí se mostrarán los estados de la partida -->
+        </div>
+
+        <div id="cont-tablero" class="hidden">
+            <h1>El juego inicia en:</h1>
+            <p id="contador-inicial">5 segundos</p>
+        </div>
+
+        <div id="cont-nombres" class="hidden nombre-jugadores">
+            <p id="nombre1" class="nombre1">Nombre 1</p>
+            <p id="nombre2">Nombre 2</p>
+        </div>
+
+        <div id="cont-puntaje" class="hidden cont-jugadores">
+            <!-- Resultado 1 para el jugador actual, resultado2 para el oponente. -->
+            <p id="resultadoj1">0</p>
+            <p id="resultadoj2">0</p>
+        </div>
+
+        <!-- Contenedor de movimientos con drag-and-drop -->
+        <div id="movimientos-container" class="hidden">
+            <h2>Tus Movimientos</h2>
+            <div id="movimientos" class="movimientos">
+                <!-- Movimientos generados se insertarán aquí -->
+            </div>
+        </div>
+
+        <div id="cont-btn" class="hidden">
+            <button id="btnListo" class="boton-sala btn-listo">Listo</button>
         </div>
     </div>
 
-    <div id="sala-juego" class="hidden">
-        <h2>Bienvenido a la Sala</h2>
-        <p id="info-sala"></p>
-    </div>
-
-    <div id="estado-partida">
-        <!-- Aquí se mostrarán los estados de la partida -->
-    </div>
-
-    <div id="cont-tablero" class="hidden">
-        <h1>El juego inicia en:</h1>
-        <p id="contador-inicial">5 segundos</p>
-    </div>
-
-    <div id="cont-nombres" class="hidden nombre-jugadores">
-        <p id="nombre1">Nombre 1</p>
-        <p id="nombre2">Nombre 2</p>
-    </div>
-
-    <div id="cont-puntaje" class="hidden cont-jugadores">
-        <!-- Resultado 1 para el jugador actual, resultado2 para el oponente. -->
-        <p id="resultadoj1">0</p>
-        <p id="resultadoj2">0</p>
-    </div>
-
-    <!-- Contenedor de movimientos con drag-and-drop -->
-    <div id="movimientos-container" class="hidden">
-        <h2>Tus Movimientos</h2>
-        <div id="movimientos" class="movimientos">
-            <!-- Movimientos generados se insertarán aquí -->
+    <div id="cont-finjuego" class="fin-juego hidden">
+        <div class="cont-elementos">
+            <div class="cont-resultados">
+                <div class="fj-nombres">
+                    <p id="fj-nombre1"></p>
+                    <p id="fj-puntos1"></p>
+                </div>
+                <div class="fj-nombres">
+                    <p id="fj-nombre2"></p>
+                    <p id="fj-puntos2"></p>
+                </div>
+            </div>
+            <div class="fj-buttons">
+                <button id="btn-revancha" class="boton-sala btn-revancha">Revancha</button>
+                <button id="btn-salir" class="boton-sala btn-salir">Salir</button>
+            </div>
         </div>
-    </div>
-
-    <div id="cont-btn" class="hidden">
-        <button id="btnListo" class="boton-sala btn-listo">Listo</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>

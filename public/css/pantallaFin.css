@@ -1,0 +1,77 @@
+@font-face {
+    font-family: 'blockHead';
+    src: url('/assets/fonts/Blockhead.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'blockHead', sans-serif;
+}
+
+
+
+/* Estilos generales para todos los dispositivos */
+.fin-juego {
+    background-color: blue;
+    text-align: center;
+    color: white;
+}
+
+/* Estilos para dispositivos pequeños (celulares, pantallas menores a 768px) */
+@media screen and (max-width: 768px) {
+    .hidden {
+        display: none;
+    }
+    .fin-juego {
+        background-color: #d5d5d5; /* Cambiar el color de fondo para móviles */
+        font-size: 16px; /* Tamaño de texto más pequeño */
+        width: 100vw; /* 100% del ancho de la ventana */
+        height: 100vh; /* 100% del alto de la ventana */
+        color: #000;
+        display: flex; /* Activa flexbox */
+        justify-content: center; /* Centra horizontalmente */
+        align-items: center; /* Centra verticalmente */
+    }
+    .cont-elementos {
+        background: white;
+        margin: 0 auto;
+        width: 90%;
+        padding: 10px;
+        box-shadow: 0 0 0 1px #32325d0d, 0 2px 5px 0 #32325d1a, 0 1px 1px 0 #00000012;
+    }
+
+    .cont-resultados {
+        font-size: 17px;
+    }
+
+    .fj-nombres {
+        display: flex;
+        justify-content: space-evenly;
+    }
+    .fj-buttons {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .btn-revancha {
+        background-color: var(--color-secundario);
+        border-bottom: 7px solid #539a00;
+    }
+    .btn-salir {
+        background-color: var(--color-peligro);
+        border-bottom: 7px solid #e23b3b;
+    }
+}
+
+/* Estilos para dispositivos más grandes (computadoras, pantallas mayores a 768px) */
+@media screen and (min-width: 769px) {
+    .fin-juego {
+        background-color: red; /* Cambiar el color de fondo para PC */
+        font-size: 24px; /* Tamaño de texto más grande */
+        padding: 40px; /* Más espacio en PC */
+        border-radius: 20px; /* Bordes más pronunciados */
+        width: 50%; /* Contenedor más pequeño */
+        margin: 0 auto; /* Centrar en la pantalla */
+    }
+}

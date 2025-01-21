@@ -8,18 +8,15 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
-const salas = {}; // { codigoSala: [socketId1, socketId2] }
+const salas = {}; // { codigoSala: { jugadores: [socketId1, socketId2], puntos: { socketId1: 0, socketId2: 0 } } }
 const timers = {};
-const jugadoresListos = {};
 const movimientosPorSala = {};
-let pj1 = 0;
-let pj2 = 0;
 
 // Función para emitir el estado de las salas a todos los clientes
 function actualizarSalas() {
-  const estadoSalas = Object.entries(salas).map(([codigo, usuarios]) => ({
+  const estadoSalas = Object.entries(salas).map(([codigo, data]) => ({
     codigo,
-    usuarios: usuarios.length,
+    usuarios: data.jugadores.length,
   }));
   io.emit('actualizarSalas', estadoSalas);
 }
@@ -43,8 +40,8 @@ function iniciarTemporizadorSala(codigoSala) {
       delete timers[codigoSala];
       io.to(codigoSala).emit('temporizadorFinalizado');
 
-      const jugador1Id = salas[codigoSala][0];
-      const jugador2Id = salas[codigoSala][1];
+      const { jugadores } = salas[codigoSala];
+      const [jugador1Id, jugador2Id] = jugadores;
 
       const movimientosJugador1 = generarMovimientosAleatorios();
       const movimientosJugador2 = generarMovimientosAleatorios();
@@ -53,7 +50,7 @@ function iniciarTemporizadorSala(codigoSala) {
       io.to(jugador1Id).emit('recibirMovimientos', movimientosJugador1);
       io.to(jugador2Id).emit('recibirMovimientos', movimientosJugador2);
 
-      // Enviar el turno a cada jugador.
+      // Enviar el turno a cada jugador
       io.to(jugador1Id).emit('asignarTurnos', { turno1: jugador1Id, turno2: jugador2Id });
       io.to(jugador2Id).emit('asignarTurnos', { turno1: jugador1Id, turno2: jugador2Id });
     }
@@ -65,21 +62,7 @@ function generarMovimientosAleatorios() {
   return Array.from({ length: 5 }, () => opciones[Math.floor(Math.random() * 3)]);
 }
 
-function obtenerCodigoSala(jugadorId) {
-  for (const [codigoSala, jugadores] of Object.entries(salas)) {
-    if (jugadores.includes(jugadorId)) {
-      return codigoSala;
-    }
-  }
-  return null; // Si no se encuentra la sala
-}
-
-function analizarMovimientos(movimientos, jugadores) {
-  const resultados = {
-    [jugadores[0]]: 0, // Puntos jugador 1
-    [jugadores[1]]: 0, // Puntos jugador 2
-  };
-
+function analizarMovimientos(movimientos, jugadores, puntos) {
   const reglas = {
     Piedra: 'Tijera',
     Tijera: 'Papel',
@@ -92,58 +75,46 @@ function analizarMovimientos(movimientos, jugadores) {
 
     if (mov1 === mov2) {
       // Empate
-      resultados[jugadores[0]] += 1;
-      resultados[jugadores[1]] += 1;
+      puntos[jugadores[0]] += 1;
+      puntos[jugadores[1]] += 1;
     } else if (reglas[mov1] === mov2) {
       // Jugador 1 gana
-      resultados[jugadores[0]] += 2;
+      puntos[jugadores[0]] += 2;
     } else {
       // Jugador 2 gana
-      resultados[jugadores[1]] += 2;
+      puntos[jugadores[1]] += 2;
     }
   }
 
-  // Convertir el objeto de resultados a un array de objetos con idJugador y puntos
-  const resultadoFinal = [
-    { idJugador: jugadores[0], puntos: resultados[jugadores[0]] },
-    { idJugador: jugadores[1], puntos: resultados[jugadores[1]] }
-  ];
-
-  pj1 += resultados[jugadores[0]];
-  pj2 += resultados[jugadores[1]];
-
-  
-  if(pj1 > 9 || pj2 > 9){
-    console.log(pj1, pj2);
-    finDelJuego(jugadores[0]);
-  }
-
-  return resultadoFinal;
+  // Crear un array con los resultados
+  return jugadores.map(jugadorId => ({
+    idJugador: jugadorId,
+    puntos: puntos[jugadorId],
+  }));
 }
 
-function finDelJuego(idJugador){
-  const codigoSala = obtenerCodigoSala(idJugador);
-  if(codigoSala){
-    // Emitir el mensaje de juego finazilado
-    io.to(codigoSala).emit('se_finDelJuego');
-  }
+function finDelJuego(codigoSala, resultadoPuntos) {
+  io.to(codigoSala).emit('se_finDelJuego', resultadoPuntos);
 }
 
 io.on('connection', (socket) => {
   console.log('Usuario conectado:', socket.id);
 
-   // Enviar la lista actual de salas al cliente si lo solicita
+  // Enviar la lista actual de salas al cliente si lo solicita
   socket.on('obtenerSalas', () => {
-    socket.emit('actualizarSalas', Object.entries(salas).map(([codigo, usuarios]) => ({
+    socket.emit('actualizarSalas', Object.entries(salas).map(([codigo, data]) => ({
       codigo,
-      usuarios: usuarios.length,
+      usuarios: data.jugadores.length,
     })));
   });
 
   // Crear Sala
   socket.on('crearSala', (callback) => {
     const codigo = Math.random().toString(36).substr(2, 6).toUpperCase();
-    salas[codigo] = [socket.id];
+    salas[codigo] = {
+      jugadores: [socket.id],
+      puntos: { [socket.id]: 0 },
+    };
     socket.join(codigo);
     console.log(`Sala creada: ${codigo}, Usuario: ${socket.id}`);
     callback(codigo);
@@ -153,26 +124,25 @@ io.on('connection', (socket) => {
   // Unirse a Sala
   socket.on('unirseSala', (codigo, callback) => {
     if (salas[codigo]) {
-      if (salas[codigo].length < 2) {
-        salas[codigo].push(socket.id);
+      if (salas[codigo].jugadores.length < 2) {
+        salas[codigo].jugadores.push(socket.id);
+        salas[codigo].puntos[socket.id] = 0;
         socket.join(codigo);
-        // console.log(`Usuario ${socket.id} se unió a la sala ${codigo}`);
 
-        if (salas[codigo].length === 2) {
+        if (salas[codigo].jugadores.length === 2) {
           io.to(codigo).emit('salaLista', {
             codigo,
-            jugadores: salas[codigo],
+            jugadores: salas[codigo].jugadores,
           });
-          // Iniciar el temporizador para la sala
           iniciarTemporizadorSala(codigo);
         }
-        // Obtener el ID del oponente si existe
-        const oponente = salas[codigo].find(id => id !== socket.id);
+
+        const oponente = salas[codigo].jugadores.find(id => id !== socket.id);
         callback({
           success: true,
           codigo,
           oponenteId: oponente || null,
-          jugadores: salas[codigo], // Lista de los jugadores
+          jugadores: salas[codigo].jugadores,
         });
 
         actualizarSalas();
@@ -186,36 +156,38 @@ io.on('connection', (socket) => {
 
   socket.on('jugadorListo', ({ codigoSala, movimientos }) => {
     if (!movimientosPorSala[codigoSala]) {
-       movimientosPorSala[codigoSala] = {};
+      movimientosPorSala[codigoSala] = {};
     }
 
     // Almacenar los movimientos del jugador
     movimientosPorSala[codigoSala][socket.id] = movimientos;
 
     // Verificar si ambos jugadores han enviado sus movimientos
-    const jugadores = salas[codigoSala];
+    const { jugadores, puntos } = salas[codigoSala];
     if (
-        movimientosPorSala[codigoSala][jugadores[0]] &&
-        movimientosPorSala[codigoSala][jugadores[1]]
+      movimientosPorSala[codigoSala][jugadores[0]] &&
+      movimientosPorSala[codigoSala][jugadores[1]]
     ) {
-        // Ambos jugadores están listos, pasar a la fase de análisis
-        const resultado = analizarMovimientos(movimientosPorSala[codigoSala], jugadores);
+      const resultado = analizarMovimientos(movimientosPorSala[codigoSala], jugadores, puntos);
 
-      // Emitir el resultado a ambos jugadores
+      // Emitir el resultado de la ronda
       io.to(codigoSala).emit('resultadoRonda', resultado);
 
-        // Limpiar los movimientos después de procesarlos
-        delete movimientosPorSala[codigoSala];
+      // Verificar si el juego ha terminado
+      if (puntos[jugadores[0]] >= 10 || puntos[jugadores[1]] >= 10) {
+        finDelJuego(codigoSala, resultado);
+      }
+
+      delete movimientosPorSala[codigoSala]; // Limpiar después de analizar
     }
   });
-
 
   // Desconexión
   socket.on('disconnect', () => {
     console.log(`Usuario desconectado: ${socket.id}`);
     for (const codigo in salas) {
-      salas[codigo] = salas[codigo].filter((id) => id !== socket.id);
-      if (salas[codigo].length === 0) {
+      salas[codigo].jugadores = salas[codigo].jugadores.filter(id => id !== socket.id);
+      if (salas[codigo].jugadores.length === 0) {
         delete salas[codigo];
       }
     }

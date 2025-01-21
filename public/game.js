@@ -1,5 +1,5 @@
 import { setupSocketHandlers } from './socketHandlers.js';
-import { actualizarEstadoPartida, entrarEnSala, bloquearBtnListo } from './uiUpdates.js';
+import { actualizarEstadoPartida, entrarEnSala, bloquearBtnListo, ocultarPantalla } from './uiUpdates.js';
 
 const socket = io();
 
@@ -12,12 +12,13 @@ function crearSala() {
   socket.emit('crearSala', (codigo) => {
     // console.log(`Sala creada: ${codigo}`);
     globalCodigoSala = codigo;
+    ocultarPantalla('controles-iniciales');
     entrarEnSala(codigo, "Esperando jugador...", 1);
   });
 }
 
 // Función para unirse a una sala
-function unirseASala(codigoSala) {
+export function unirseASala(codigoSala) {
   socket.emit('unirseSala', codigoSala, (respuesta) => {
     if (respuesta.success) {
       entrarEnSala(codigoSala, "Esperando jugador2...", 2);
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     botonCrear.addEventListener('click', crearSala);
   }
 
-  // Configurar botón para unirse a sala
+  // !Configurar botón para unirse a sala
   if (botonUnirse) {
     botonUnirse.addEventListener('click', () => {
       const codigoSala = codigoSalaSeleccionada.value.trim(); // Eliminar espacios en blanco

@@ -1,4 +1,5 @@
 import { initializeDragAndDrop } from './dragAndDrop.js';
+import { unirseASala } from './game.js';
 
 const idUsuario = document.getElementById('usuario-id');
 const controlesIniciales = document.getElementById('controles-iniciales');
@@ -7,6 +8,12 @@ const salaJuego = document.getElementById('sala-juego');
 const infoSala = document.getElementById('info-sala');
 const contbBtnListo = document.getElementById('cont-btn');
 const btnListo = document.getElementById('btnListo');
+const contJuego = document.getElementById('cont-juego');
+const contFinJuego = document.getElementById('cont-finjuego');
+const fjNombre1 = document.getElementById('fj-nombre1');
+const fjPuntos1 = document.getElementById('fj-puntos1');
+const fjNombre2 = document.getElementById('fj-nombre2');
+const fjPuntos2 = document.getElementById('fj-puntos2');
 
 let pj1Puntos = 0;
 let pj2Puntos = 0;
@@ -72,9 +79,17 @@ export function actualizarListaDeSalas(salas) {
     contenedorSalas.innerHTML = '';
     salas.forEach(({ codigo, usuarios }) => {
       const salaItem = document.createElement('p');
+      const btnUnirse = document.createElement('button');
+      
+      btnUnirse.textContent = 'unirse';
+      btnUnirse.classList.add('btn-unirse');
+      btnUnirse.addEventListener('click', () => unirseASala(codigo)); // Correcto
       salaItem.textContent = `Sala: ${codigo} | Jugadores: ${usuarios}`;
+      
       contenedorSalas.appendChild(salaItem);
+      contenedorSalas.appendChild(btnUnirse);
     });
+    
   }
 }
   
@@ -163,4 +178,28 @@ export function bloquearBtnListo(bOpcion){
     btnListo.classList.remove('btn-disabled');
     btnListo.classList.add('btn-listo');
   }
+}
+
+export function uiJuegoFinalizado(idJugador, resultadoPuntos){
+
+  contJuego.classList.add('hidden');
+  contFinJuego.classList.remove('hidden');
+
+  for(let res of resultadoPuntos){
+    if(idJugador === res.idJugador){
+      fjNombre1.textContent = idJugador;
+      fjPuntos1.textContent = res.puntos;
+    }
+    else {
+      fjNombre2.textContent = res.idJugador;
+      fjPuntos2.textContent = res.puntos;
+    }
+  }
+
+  console.log(idJugador, resultadoPuntos);
+}
+
+export const ocultarPantalla = (idElemento) => {
+  let elemento = document.getElementById(idElemento);
+  elemento.classList.add('_cont-iniciales');
 }

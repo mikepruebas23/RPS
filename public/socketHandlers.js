@@ -1,5 +1,5 @@
 import { actualizarEstadoPartida, actualizarTempo, actualizarListaDeSalas, actualizarMovimientos, renderPuntuacionesRonda, renderBtnListo,
-  bloquearBtnListo
+  bloquearBtnListo, uiJuegoFinalizado
  } from './uiUpdates.js';
 
 
@@ -59,6 +59,7 @@ export function setupSocketHandlers(socket) {
 
   // Escuchar el evento cuando ambos jugadores estén listos
   socket.on("resultadoRonda", (resultado) => {
+    console.log(resultado);
     renderPuntuacionesRonda(globalUsuarioId, resultado);
 
     if(estatusJuego != 'finalizado'){
@@ -69,10 +70,11 @@ export function setupSocketHandlers(socket) {
   });
 
   // Escuchar el evento cuando ambos jugadores estén listos
-  socket.on("se_finDelJuego", () => {
+  socket.on("se_finDelJuego", (resultado) => {
     estatusJuego = 'finalizado';
     console.log("El juego a finalizado.");
     bloquearBtnListo(true);
+    uiJuegoFinalizado(globalUsuarioId, resultado);
     // console.log(resultado);
     // Aquí puedes activar la lógica de la fase de análisis o actualizar la UI
   });
