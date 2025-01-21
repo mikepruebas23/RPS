@@ -1,8 +1,7 @@
 
-/**
- * Inicializa el contenedor de movimientos con funcionalidad de drag-and-drop.
- * @param {Object} options - Opciones adicionales para configurar SortableJS.
- */
+export let movimientosGlobales = [];
+
+
 export function initializeDragAndDrop(options = {}) {
   const movimientosContainer = document.getElementById('movimientos');
 
@@ -20,16 +19,29 @@ export function initializeDragAndDrop(options = {}) {
 
 function actualizarOrdenMovimientos() {
   const movimientosContainer = document.getElementById('movimientos');
-  const nuevoOrden = Array.from(movimientosContainer.children).map((item) => item.textContent.trim());
+  
+  const nuevoOrden = Array.from(movimientosContainer.children).map((item) => {
+    const imagen = item.querySelector('img');
+    if (imagen) {
+      let imagenSrc = imagen.src;
 
-  // console.log('Nuevo orden de movimientos:', nuevoOrden);
+      // Eliminar la ruta del proyecto y la extensión .svg
+      imagenSrc = imagenSrc.split('/images/')[1].replace('.svg', '');
 
-  // Emite un evento personalizado con el nuevo orden
-  // const eventoOrdenActualizado = new CustomEvent('ordenMovimientosActualizado', {
-  //   detail: { orden: nuevoOrden },
-  // });
-  // document.dispatchEvent(eventoOrdenActualizado);
+      // Cambiar los valores de las imágenes
+      if (imagenSrc === 'smash') {
+        return 'Piedra';
+      } else if (imagenSrc === 'sword') {
+        return 'Tijera';
+      } else if (imagenSrc === 'shield') {
+        return 'Papel';
+      }
 
-  // Descomentar para enviar al servidor si es necesario
-  // socket.emit('actualizarOrdenMovimientos', nuevoOrden);
+      return imagenSrc; // Si no es uno de los tres, devolver el nombre tal cual
+    }
+    return ''; // Si no hay imagen, devolver vacío
+  });
+
+  movimientosGlobales = nuevoOrden;
 }
+

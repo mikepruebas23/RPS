@@ -15,12 +15,20 @@
             <!-- Aquí se mostrará el ID del usuario -->
         </div>
 
+        <!-- <div>
+            <image src="./images/fondoFinal.jpg" width="200px" height="200px"/>
+        </div> -->
+        
+        <div class="cont-logo">
+            <image src="./images/logo.svg" width="150px" heith="150px" alt="logo"/>
+        </div>
+
         <div id="controles-iniciales" class="_cont-iniciales">
             <button id="crear" class="crear-sala boton-sala">Crear Sala</button>
             <!-- <input id="codigo" placeholder="Código de Sala" autocomplete="false"> -->
             <!-- <button id="unirse" class="unirse-sala boton-sala">Unirse a Sala</button> -->
         </div>
-
+        
         <div id="lista-salas">
             <h2>Salas disponibles:</h2>
             <div id="contenedor-sala" class="contenedor-sala">
@@ -62,11 +70,13 @@
         </div>
 
         <div id="cont-btn" class="hidden">
-            <button id="btnListo" class="boton-sala btn-listo">Listo</button>
+            <button id="btnListo" class="boton-sala btn-listo">
+                <img src="./images/ready.svg" width="20px" height="20px" alt="" />
+            </button>
         </div>
     </div>
 
-    <div id="cont-finjuego" class="fin-juego hidden">
+    <div id="cont-finjuego" class="fin-juego hidden pantalla-final">
         <div class="cont-elementos">
             <div class="cont-resultados">
                 <div class="fj-nombres">

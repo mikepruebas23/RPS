@@ -1,5 +1,6 @@
 import { setupSocketHandlers } from './socketHandlers.js';
 import { actualizarEstadoPartida, entrarEnSala, bloquearBtnListo, ocultarPantalla } from './uiUpdates.js';
+import { movimientosGlobales } from './dragAndDrop.js';
 
 const socket = io();
 
@@ -61,12 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Evento para bloquear el botón cuando el jugador está listo
   document.getElementById("btnListo").addEventListener("click", () => {
-    const movimientosContainer = document.getElementById('movimientos');
-    const nuevoOrden = Array.from(movimientosContainer.children).map((item) => item.textContent.trim());
-    console.log("Los movimientos a mandar, son: ", nuevoOrden);
+    // console.log(movimientosGlobales);
+    // console.log("Los movimientos a mandar, son: ", movimientosGlobales);
     socket.emit('jugadorListo', {
       codigoSala: globalCodigoSala,
-      movimientos: nuevoOrden,  // El orden de los movimientos del jugador
+      movimientos: movimientosGlobales,  // El orden de los movimientos del jugador
   });
     bloquearBtnListo(true);
   });

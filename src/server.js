@@ -49,10 +49,6 @@ function iniciarTemporizadorSala(codigoSala) {
       // Emitir los movimientos a cada jugador
       io.to(jugador1Id).emit('recibirMovimientos', movimientosJugador1);
       io.to(jugador2Id).emit('recibirMovimientos', movimientosJugador2);
-
-      // Enviar el turno a cada jugador
-      io.to(jugador1Id).emit('asignarTurnos', { turno1: jugador1Id, turno2: jugador2Id });
-      io.to(jugador2Id).emit('asignarTurnos', { turno1: jugador1Id, turno2: jugador2Id });
     }
   }, 1000); // Cada 1 segundo
 }

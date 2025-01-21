@@ -99,13 +99,18 @@ input {
 .movimiento {
   user-select: none;
   cursor: grab;
-  padding: 14px 35px;
-  border-radius: 5px;
+  padding: 6px 15px;
+  border-radius: 3px;
   background: var(--color-primario);
   color: var(--color-texto);
   box-shadow: var(--sombra-boton);
   border-bottom: 7px solid #125cb7;
   transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+.icono-movimiento {
+  width: 30px;
+  height: 30px;
 }
 
 .boton-sala {
@@ -118,6 +123,7 @@ input {
   color: var(--color-texto);
   transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
   font-family: 'blockHead', sans-serif;
+  border: 2px solid white;
 }
 
 .crear-sala {
@@ -150,8 +156,11 @@ input {
 }
 
 .btn-listo {
-  background-color: var(--color-primario);
-  border-bottom: 7px solid #115db9;
+  background: var(--color-secundario);
+  border-bottom: 7px solid #539a00;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
 }
 
 .btn-listo:hover {
@@ -173,6 +182,22 @@ input {
   border-bottom: 7px solid #7f7f7f;
 }
 
+.btn-disabled-circle {
+  cursor: pointer;
+  text-decoration: none;
+  border-width: 1px;
+  padding: 14px 35px;
+  border-radius: 5px;
+  box-shadow: var(--sombra-boton);
+  color: var(--color-texto-disabled);
+  transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  background-color: var(--color-disabled);
+  border-bottom: 7px solid #7f7f7f;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
 .mi-turno{
   background-color: rgb(119, 0, 255);
 }
@@ -187,6 +212,10 @@ input {
   align-items: center;
   width: 90%;
   margin: 0 auto;
+}
+
+#resultadoj1, #resultadoj2 {
+  font-size: 14px;
 }
 
 .hidden {

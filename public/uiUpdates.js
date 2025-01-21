@@ -96,13 +96,30 @@ export function actualizarListaDeSalas(salas) {
 export function actualizarMovimientos(movimientos) {
   const contenedorMovimientos = document.getElementById('movimientos');
   if (contenedorMovimientos) {
+    // Meter los movimientos en su imagen correspondiente.
     contenedorMovimientos.innerHTML = movimientos
-      .map((movimiento) => `<div class="movimiento">${movimiento}</div>`)
+      .map((movimiento) => `<div class="movimiento">${obtenerImagenMovimiento(movimiento)}</div>`)
       .join('');
+      
     initializeDragAndDrop();
   } else {
     console.error('Elemento movimientos no encontrado.');
   }
+}
+
+function obtenerImagenMovimiento(mov){
+  let img = '';
+  if(mov === "Piedra"){
+    img = 'smash';
+  }
+  else if(mov === 'Tijera'){
+    img = 'sword';
+  } 
+  else {
+    img = 'shield';
+  }
+
+  return `<img src="./images/${img}.svg" class="icono-movimiento" alt="icono smash" />`;
 }
 
 export function actualizarIndicadorTurno(esMiTurno) {
@@ -151,12 +168,12 @@ export function renderPuntuacionesRonda(idJugador, resultado){
     if(idJugador === res.idJugador){
       pj1Puntos += res.puntos;
       resultado1.textContent = pj1Puntos
-      nombre1.textContent = idJugador;
+      nombre1.textContent = 'Tú';
     }
     else {
       pj2Puntos += res.puntos;
       resultado2.textContent = pj2Puntos;
-      nombre2.textContent = res.idJugador;
+      nombre2.textContent = 'Oponente';
     }
   }
 }
@@ -171,11 +188,11 @@ export function bloquearBtnListo(bOpcion){
   btnListo.disabled = bOpcion; 
 
   if(bOpcion){ 
-    btnListo.classList.add('btn-disabled');
+    btnListo.classList.add('btn-disabled-circle');
     btnListo.classList.remove('btn-listo');
   } 
   else {
-    btnListo.classList.remove('btn-disabled');
+    btnListo.classList.remove('btn-disabled-circle');
     btnListo.classList.add('btn-listo');
   }
 }
@@ -187,11 +204,11 @@ export function uiJuegoFinalizado(idJugador, resultadoPuntos){
 
   for(let res of resultadoPuntos){
     if(idJugador === res.idJugador){
-      fjNombre1.textContent = idJugador;
+      fjNombre1.textContent = "Tú";
       fjPuntos1.textContent = res.puntos;
     }
     else {
-      fjNombre2.textContent = res.idJugador;
+      fjNombre2.textContent = "Oponente";
       fjPuntos2.textContent = res.puntos;
     }
   }

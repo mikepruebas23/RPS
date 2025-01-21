@@ -34,15 +34,17 @@ body {
         align-items: center; /* Centra verticalmente */
     }
     .cont-elementos {
-        background: white;
+        /* background: white; */
         margin: 0 auto;
-        width: 90%;
-        padding: 10px;
+        width: 70%;
+        /* padding: 10px; */
         box-shadow: 0 0 0 1px #32325d0d, 0 2px 5px 0 #32325d1a, 0 1px 1px 0 #00000012;
     }
 
     .cont-resultados {
         font-size: 17px;
+        color: white;
+        background: #25253f;
     }
 
     .fj-nombres {
@@ -61,6 +63,18 @@ body {
     .btn-salir {
         background-color: var(--color-peligro);
         border-bottom: 7px solid #e23b3b;
+    }
+    .pantalla-final {
+        background-image: url('../images/fondoFinal.jpg');
+        background-size: cover;        /* Asegura que la imagen cubra todo el área */
+        background-position: center;   /* Centra la imagen */
+        background-repeat: no-repeat;  /* Evita que la imagen se repita */
+        width: 100%;
+        height: 100vh;                 /* Hace que el div ocupe toda la altura de la pantalla */
+    }
+
+    .hidden {
+        display: none;
     }
 }
 
