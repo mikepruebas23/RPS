@@ -1,5 +1,5 @@
 import { setupSocketHandlers } from './socketHandlers.js';
-import { actualizarEstadoPartida, entrarEnSala, bloquearBtnListo, ocultarPantalla } from './uiUpdates.js';
+import { actualizarEstatusJugador, entrarEnSala, bloquearBtnListo, ocultarPantalla, ESTATUS_JUGADOR } from './uiUpdates.js';
 import { movimientosGlobales } from './dragAndDrop.js';
 
 const socket = io();
@@ -11,7 +11,6 @@ let globalCodigoSala;
 // Función para crear una sala
 function crearSala() {
   socket.emit('crearSala', (codigo) => {
-    // console.log(`Sala creada: ${codigo}`);
     globalCodigoSala = codigo;
     ocultarPantalla('controles-iniciales');
     entrarEnSala(codigo, "Esperando jugador...", 1);
@@ -22,8 +21,8 @@ function crearSala() {
 export function unirseASala(codigoSala) {
   socket.emit('unirseSala', codigoSala, (respuesta) => {
     if (respuesta.success) {
-      entrarEnSala(codigoSala, "Esperando jugador2...", 2);
-      globalCodigoSala = respuesta.codigo;;
+      entrarEnSala(codigoSala, " ", 2);
+      globalCodigoSala = respuesta.codigo;
     } else {
       console.error(respuesta.message);
       // Aquí puedes agregar una función para mostrar el error en la interfaz
@@ -63,11 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Evento para bloquear el botón cuando el jugador está listo
   document.getElementById("btnListo").addEventListener("click", () => {
     // console.log(movimientosGlobales);
-    // console.log("Los movimientos a mandar, son: ", movimientosGlobales);
     socket.emit('jugadorListo', {
       codigoSala: globalCodigoSala,
       movimientos: movimientosGlobales,  // El orden de los movimientos del jugador
-  });
+    });
+    actualizarEstatusJugador(ESTATUS_JUGADOR.MANO_LISTA);
     bloquearBtnListo(true);
   });
 });

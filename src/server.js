@@ -22,7 +22,7 @@ function actualizarSalas() {
 }
 
 function iniciarTemporizadorSala(codigoSala) {
-  let tiempoRestante = 5; // Tiempo en segundos
+  let tiempoRestante = 3; // Tiempo en segundos
 
   // Verificar si ya hay un temporizador para esta sala
   if (timers[codigoSala]) return;
@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
       puntos: { [socket.id]: 0 },
     };
     socket.join(codigo);
-    console.log(`Sala creada: ${codigo}, Usuario: ${socket.id}`);
+    // console.log(`Sala creada: ${codigo}, Usuario: ${socket.id}`);
     callback(codigo);
     actualizarSalas();
   });
@@ -150,7 +150,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('jugadorListo', ({ codigoSala, movimientos }) => {
+  socket.on('jugadorListo', ({codigoSala, movimientos }) => {
+    // socket.id === jugador actual
     if (!movimientosPorSala[codigoSala]) {
       movimientosPorSala[codigoSala] = {};
     }
@@ -160,10 +161,8 @@ io.on('connection', (socket) => {
 
     // Verificar si ambos jugadores han enviado sus movimientos
     const { jugadores, puntos } = salas[codigoSala];
-    if (
-      movimientosPorSala[codigoSala][jugadores[0]] &&
-      movimientosPorSala[codigoSala][jugadores[1]]
-    ) {
+
+    if (movimientosPorSala[codigoSala][jugadores[0]] && movimientosPorSala[codigoSala][jugadores[1]]) {
       const resultado = analizarMovimientos(movimientosPorSala[codigoSala], jugadores, puntos);
 
       // Emitir el resultado de la ronda
@@ -175,6 +174,10 @@ io.on('connection', (socket) => {
       }
 
       delete movimientosPorSala[codigoSala]; // Limpiar después de analizar
+    } else {
+      //  jugadores[1]
+      const oponenteId = socket.id === jugadores[0] ? jugadores[1] : jugadores[0];
+      io.to(oponenteId).emit('visualOponenteListo');
     }
   });
 

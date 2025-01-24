@@ -1,5 +1,5 @@
-import { actualizarEstadoPartida, actualizarTempo, actualizarListaDeSalas, actualizarMovimientos, renderPuntuacionesRonda, renderBtnListo,
-  bloquearBtnListo, uiJuegoFinalizado
+import { actualizarEstadoPartida, actualizarEstatusJugador, actualizarTempo, actualizarListaDeSalas, actualizarMovimientos, renderPuntuacionesRonda,
+  bloquearBtnListo, uiJuegoFinalizado, ESTATUS_JUEGO, ESTATUS_JUGADOR
  } from './uiUpdates.js';
 
 
@@ -31,6 +31,7 @@ export function setupSocketHandlers(socket) {
   // Sala lista
   socket.on('salaLista', (data) => {
     const { codigo, jugadores } = data;
+    actualizarEstadoPartida(ESTATUS_JUEGO.SALA_LISTA);
     actualizarTempo();
 
     // console.log(`La sala ${codigo} está lista para jugar con jugadores: ${jugadores.join(', ')}`);
@@ -47,9 +48,7 @@ export function setupSocketHandlers(socket) {
   });
 
   socket.on('temporizadorFinalizado', () => {
-    // console.log('El temporizador ha terminado.');
-    actualizarEstadoPartida('¡El tiempo ha terminado!');
-    renderBtnListo();
+    actualizarEstadoPartida(ESTATUS_JUEGO.TEMP_GLOBAL_FIN);
   });
 
   // Recibir movimientos
@@ -78,6 +77,11 @@ export function setupSocketHandlers(socket) {
     // console.log(resultado);
     // Aquí puedes activar la lógica de la fase de análisis o actualizar la UI
   });
+
+
+  socket.on("visualOponenteListo", () => {
+    actualizarEstatusJugador(ESTATUS_JUGADOR.OP_MANO_LISTA);
+  })
 }
 
 

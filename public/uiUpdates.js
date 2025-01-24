@@ -2,7 +2,14 @@ import { initializeDragAndDrop } from './dragAndDrop.js';
 import { unirseASala } from './game.js';
 
 const idUsuario = document.getElementById('usuario-id');
+const contLogo = document.getElementById('cont-logo');
+const contTablero = document.getElementById('cont-tablero');
 const controlesIniciales = document.getElementById('controles-iniciales');
+const movimientosContainer = document.getElementById('movimientos-container');
+const contMensaje = document.getElementById('cont-mensaje');
+const pMensaje = document.getElementById('mensaje');
+const contNombres = document.getElementById('cont-nombres');
+const contPuntaje = document.getElementById('cont-puntaje');
 const listaSalas = document.getElementById('lista-salas');
 const salaJuego = document.getElementById('sala-juego');
 const infoSala = document.getElementById('info-sala');
@@ -14,14 +21,63 @@ const fjNombre1 = document.getElementById('fj-nombre1');
 const fjPuntos1 = document.getElementById('fj-puntos1');
 const fjNombre2 = document.getElementById('fj-nombre2');
 const fjPuntos2 = document.getElementById('fj-puntos2');
+const estadoPartida = document.getElementById('estado-partida');
 
 let pj1Puntos = 0;
 let pj2Puntos = 0;
 
-export function actualizarEstadoPartida(mensaje) {
-  const estadoPartida = document.getElementById('estado-partida');
+const MENSAJES = {
+  VACIO: '',
+  TOEL: 'Tu oponente esta listo!',
+}
+
+export const ESTATUS_JUEGO = {
+  SALA_LISTA: 'sala_lista',
+  TEMP_GLOBAL_FIN: 'TEMP_FIN',
+  TEMP_GLOBAL_INICIO: 'TEMP_INICIO'
+}
+
+export const ESTATUS_JUGADOR = {
+  MANO_LISTA: 'MANO_LISTA',
+  OP_MANO_LISTA: 'OP_MANO_LISTA',
+}
+
+export function actualizarEstadoJugador(mensaje) {
   if (estadoPartida) {
     estadoPartida.innerHTML = `<p>${mensaje}</p>`;
+  }
+}
+
+export function actualizarEstadoPartida(estatus) {
+  let mensaje = '';
+  if (estatus === 'sala_lista') {
+    salaJuego.classList.add('hidden');
+    mensaje = '';
+  }
+  estadoPartida.innerHTML = `<p>${mensaje}</p>`;
+
+  switch(estatus){
+    case ESTATUS_JUEGO.TEMP_GLOBAL_FIN:
+      _MostrarOcultarDiv(movimientosContainer,  'remove');
+      _MostrarOcultarDiv(contbBtnListo, 'remove');
+      _MostrarOcultarDiv(contTablero, 'add');
+      _MostrarOcultarDiv(contLogo, 'add');
+      _MostrarOcultarDiv(contNombres, 'remove');
+      _MostrarOcultarDiv(contPuntaje, 'remove');
+    break;
+  }
+}
+
+export function actualizarEstatusJugador(estatus){
+  switch(estatus){
+    case ESTATUS_JUGADOR.OP_MANO_LISTA:
+      _MostrarMensaje(pMensaje, MENSAJES.TOEL);
+      _MostrarOcultarDiv(contMensaje,  'remove');
+    break;
+    case ESTATUS_JUGADOR.MANO_LISTA:
+      _MostrarMensaje(pMensaje, MENSAJES.VACIO);
+      _MostrarOcultarDiv(contMensaje,  'add');
+    break;
   }
 }
   
@@ -43,26 +99,30 @@ export function entrarEnSala(codigo, mensaje="", iOpcion) {
     if(iOpcion === 1){ 
       // Muestra la interfaz de la sala de juego
       salaJuego.classList.remove('hidden');
-      infoSala.textContent = `Estás en la sala: ${codigo}`;
+      // infoSala.textContent = `Estás en la sala: ${codigo}`;
     }
     else {
       salaJuego.classList.add('hidden'); 
     }
 
-
     // Mostrar los IDs de los jugadores
     // Pendiente
     // mostrarJugadores(jugadores, oponenteId);
-    actualizarEstadoPartida(mensaje);
+    actualizarEstadoJugador(mensaje);
 };
 
 export function actualizarTempo(){
-  const contContador = document.getElementById('cont-tablero');
-  const movimientos = document.getElementById('movimientos-container');
 
-  contContador.classList.remove('hidden');
-  movimientos.classList.remove('hidden');
+  contTablero.classList.remove('hidden');
 }
+
+function _MostrarOcultarDiv(elemento, accion) {
+  elemento.classList[accion]('hidden');
+}
+
+function _MostrarMensaje(elemento, mensaje){
+  elemento.textContent = mensaje;
+};
 
 export function actualizarListaDeSalas(salas) {
   const tituloSalas = document.getElementById('titulo-listado');
@@ -122,45 +182,16 @@ function obtenerImagenMovimiento(mov){
   return `<img src="./images/${img}.svg" class="icono-movimiento" alt="icono smash" />`;
 }
 
-export function actualizarIndicadorTurno(esMiTurno) {
-
-  const indicadorTurno = document.getElementById('turno-actual');
-  const botonTerminarTurno = document.getElementById('btn-turno');
-
-  if (esMiTurno) {
-    indicadorTurno.textContent = 'Es tu turno';
-    indicadorTurno.classList.add('mi-turno');
-    indicadorTurno.classList.remove('turno-enemigo');
-
-    botonTerminarTurno.textContent = "Terminar turno";
-    botonTerminarTurno.classList.add('boton-sala');
-    botonTerminarTurno.classList.add('boton-turno');
-    botonTerminarTurno.classList.remove('btn-disabled');
-  } else {
-    indicadorTurno.textContent = 'Es el turno del otro jugador';
-    indicadorTurno.classList.add('turno-enemigo');
-    indicadorTurno.classList.remove('mi-turno');
-
-    botonTerminarTurno.textContent = "Esperando turno";
-    botonTerminarTurno.classList.remove('boton-sala');
-    botonTerminarTurno.classList.remove('boton-turno');
-    botonTerminarTurno.classList.add('btn-disabled');
-  }
-
-  botonTerminarTurno.disabled = !esMiTurno;
-}
-
 export function renderPuntuacionesRonda(idJugador, resultado){
   // idJugador = al jugador actual del soclet 
-  const contPuntaje = document.getElementById('cont-puntaje');
-  const contNombres = document.getElementById('cont-nombres');
+ 
   const nombre1 = document.getElementById('nombre1');
   const nombre2 = document.getElementById('nombre2');
   const resultado1 = document.getElementById('resultadoj1');
   const resultado2 = document.getElementById('resultadoj2');
 
-  contPuntaje.classList.remove('hidden');
-  contNombres.classList.remove('hidden');
+  nombre1.textContent = 'Tú';
+  nombre2.textContent = 'Oponente';
 
   console.log(idJugador, resultado);
   
@@ -168,18 +199,12 @@ export function renderPuntuacionesRonda(idJugador, resultado){
     if(idJugador === res.idJugador){
       pj1Puntos += res.puntos;
       resultado1.textContent = pj1Puntos
-      nombre1.textContent = 'Tú';
     }
     else {
       pj2Puntos += res.puntos;
       resultado2.textContent = pj2Puntos;
-      nombre2.textContent = 'Oponente';
     }
   }
-}
-
-export function renderBtnListo(){
-  contbBtnListo.classList.remove('hidden'); 
 }
 
 export function bloquearBtnListo(bOpcion){
