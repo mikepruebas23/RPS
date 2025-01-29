@@ -1,6 +1,6 @@
 import { setupSocketHandlers } from './socketHandlers.js';
 import { actualizarEstatusJugador, entrarEnSala, bloquearBtnListo, ocultarPantalla, ESTATUS_JUGADOR } from './uiUpdates.js';
-import { movimientosGlobales } from './dragAndDrop.js';
+import { movimientosGlobales, obtenerMovimientosTablero, toggleDragAndDrop } from './dragAndDrop.js';
 
 const socket = io();
 
@@ -62,11 +62,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // Evento para bloquear el botón cuando el jugador está listo
   document.getElementById("btnListo").addEventListener("click", () => {
     // console.log(movimientosGlobales);
-    socket.emit('jugadorListo', {
-      codigoSala: globalCodigoSala,
-      movimientos: movimientosGlobales,  // El orden de los movimientos del jugador
-    });
-    actualizarEstatusJugador(ESTATUS_JUGADOR.MANO_LISTA);
-    bloquearBtnListo(true);
+    let total = obtenerMovimientosTablero();
+    // console.log(total);
+  
+    // Verificar si 'total' es un número de 2 dígitos
+    if (total) {
+      toggleDragAndDrop(false);
+
+      // Código comentado: realizar las acciones deseadas si el total es de 2 dígitos
+      // socket.emit('jugadorListo', {
+      //   codigoSala: globalCodigoSala,
+      //   movimientos: movimientosGlobales,  // El orden de los movimientos del jugador
+      // });
+
+      // enviar mensaje y mano para el oponente.
+      socket.emit('gameEmit_movimientoListo', {
+        codigoSala: globalCodigoSala,
+        movimientos: total, 
+      });
+  
+      actualizarEstatusJugador(ESTATUS_JUGADOR.MANO_LISTA);
+
+      // eliminar movimientos que sacamos.
+  
+      // Bloquear el botón
+      bloquearBtnListo(true);
+    } else {
+      console.log("El total no es un número de dos dígitos.");
+    }
   });
+
+
 });

@@ -80,19 +80,22 @@ input {
 
 
 #movimientos {
+  font-size: 34px;
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
   padding: 10px;
-  border: 1px solid #ccc;
   background-color: #606d7b;
-  overflow-x: auto;
+  align-items: center;
+  min-height: 17vh;
 }
 
 #movimientos-container {
   width: 90%;
   margin: 10px auto;
   background: white;
-  padding: 5px;
+  /* padding: 5px; */
   border-radius: 3px;
 }
 
@@ -106,6 +109,8 @@ input {
   box-shadow: var(--sombra-boton);
   border-bottom: 7px solid #125cb7;
   transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+  height: 53%;
+  width: 5%;
 }
 
 .icono-movimiento {

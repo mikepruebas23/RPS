@@ -1,6 +1,9 @@
 import { actualizarEstadoPartida, actualizarEstatusJugador, actualizarTempo, actualizarListaDeSalas, actualizarMovimientos, renderPuntuacionesRonda,
-  bloquearBtnListo, uiJuegoFinalizado, ESTATUS_JUEGO, ESTATUS_JUGADOR
+  bloquearBtnListo, uiJuegoFinalizado, ESTATUS_JUEGO, ESTATUS_JUGADOR,
+  uiActualizarTablero
  } from './uiUpdates.js';
+
+ import { asignarMovimientos } from './dragAndDrop.js';
 
 
 export function setupSocketHandlers(socket) {
@@ -54,6 +57,7 @@ export function setupSocketHandlers(socket) {
   // Recibir movimientos
   socket.on('recibirMovimientos', (movimientos) => {
     actualizarMovimientos(movimientos);
+    asignarMovimientos(movimientos);
   });
 
   // Escuchar el evento cuando ambos jugadores estén listos
@@ -81,7 +85,32 @@ export function setupSocketHandlers(socket) {
 
   socket.on("visualOponenteListo", () => {
     actualizarEstatusJugador(ESTATUS_JUGADOR.OP_MANO_LISTA);
-  })
+  });
+
+  socket.on("serverEmit_visualOponenteListo", (movimientos) => {
+    // actualizarEstatusJugador(ESTATUS_JUGADOR.OP_MANO_LISTA);
+    // Ejemplo movimientos: [2,4]
+    uiActualizarTablero(movimientos);
+  });
+
+  // cuando los 2 jugadores ponen sus movimientos.
+  socket.on("serverEmit_RondaLista", (totalMovimientos, resultado) => {
+    // Obtener todos los IDs de los jugadores en la ronda
+    const jugadores = Object.keys(totalMovimientos);
+  
+    // Buscar el ID contrario
+    const movimientoOponente = jugadores.find(id => id !== globalUsuarioId);
+  
+    if (movimientoOponente) {
+      const movimientos = totalMovimientos[movimientoOponente]; // Movimientos del oponente
+      console.log("Movimientos del oponente:", movimientos);
+      uiActualizarTablero(movimientos);
+      renderPuntuacionesRonda(globalUsuarioId, resultado);
+    } else {
+      console.error("No se encontró el ID contrario.");
+    }
+  });
+  
 }
 
 

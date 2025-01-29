@@ -1,0 +1,31 @@
+.cont-tablero {
+    width: 90%;
+    background: #606d7b;
+    /* height: 20vh; */
+}
+
+.tablero-opo, .tablero-mio {
+    background: #4a5460;
+    height: 7vh;
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 13px;
+    font-size: 21px;
+}
+
+.movimiento-opo {
+    user-select: none;
+    cursor: grab;
+    padding: 6px 15px;
+    border-radius: 3px;
+    background: #ff4444;
+    color: var(--color-texto);
+    box-shadow: var(--sombra-boton);
+    border-bottom: 7px solid #ce1a1a;
+    transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+    min-height: 53%;
+    min-width: 5%;
+}
+

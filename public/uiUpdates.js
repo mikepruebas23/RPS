@@ -1,4 +1,4 @@
-import { initializeDragAndDrop } from './dragAndDrop.js';
+import { initializeDragAndDrop, toggleDragAndDrop } from './dragAndDrop.js';
 import { unirseASala } from './game.js';
 
 const idUsuario = document.getElementById('usuario-id');
@@ -80,6 +80,25 @@ export function actualizarEstatusJugador(estatus){
     break;
   }
 }
+
+export function uiActualizarTablero(movimientos) {
+  const tabOponente = document.getElementById('tablero-opo');
+
+  // Limpiar el tablero antes de agregar nuevos movimientos
+  while (tabOponente.firstChild) {
+    tabOponente.removeChild(tabOponente.firstChild);
+  }
+
+  // Iterar sobre los movimientos y agregar cada uno al tablero
+  movimientos.forEach((movimiento) => {
+    const div = document.createElement('div');
+    div.classList.add('movimiento-opo'); // Agregar la clase CSS
+    div.textContent = movimiento; // Asignar el valor numérico
+
+    tabOponente.appendChild(div); // Agregar el div al tablero
+  });
+}
+
   
 export function mostrarJugadores(jugadores, oponenteId) {
   if (infoSala) {
@@ -158,10 +177,12 @@ export function actualizarMovimientos(movimientos) {
   if (contenedorMovimientos) {
     // Meter los movimientos en su imagen correspondiente.
     contenedorMovimientos.innerHTML = movimientos
-      .map((movimiento) => `<div class="movimiento">${obtenerImagenMovimiento(movimiento)}</div>`)
+      // .map((movimiento) => `<div class="movimiento">${obtenerImagenMovimiento(movimiento)}</div>`)
+      .map((movimiento) => `<div class="movimiento">${movimiento}</div>`)
       .join('');
       
     initializeDragAndDrop();
+    // toggleDragAndDrop(false);
   } else {
     console.error('Elemento movimientos no encontrado.');
   }
@@ -244,4 +265,11 @@ export function uiJuegoFinalizado(idJugador, resultadoPuntos){
 export const ocultarPantalla = (idElemento) => {
   let elemento = document.getElementById(idElemento);
   elemento.classList.add('_cont-iniciales');
+}
+
+// Actualizar tablero del usuario
+export const actualizarTablero = () => {
+  const tablero = document.getElementById('tablero-mio');
+  const elementos = tablero.getElementsByClassName('movimiento');
+
 }
