@@ -44,8 +44,8 @@ function iniciarTemporizadorSala(codigoSala) {
       const [jugador1Id, jugador2Id] = jugadores;
 
       // ejemplo : [7, 3, 0, 9, 1, 6, 4, 2, 8, 5]
-      const movimientosJugador1 = generarMovimientosAleatorios();
-      const movimientosJugador2 = generarMovimientosAleatorios();
+      const movimientosJugador1 = generarMovimientosTablero();
+      const movimientosJugador2 = generarMovimientosTablero();
 
       // Emitir los movimientos a cada jugador
       io.to(jugador1Id).emit('recibirMovimientos', movimientosJugador1);
@@ -54,57 +54,13 @@ function iniciarTemporizadorSala(codigoSala) {
   }, 1000); // Cada 1 segundo
 }
 
-function generarMovimientosAleatorios() {
+function generarMovimientosTablero() {
   // return Array.from({ length: 10 }, () => Math.floor(Math.random() * 10)); // aleatorios
   return Array.from({ length: 10 }, (_, index) => index); // en orden
 }
 
-
 function analizarMovimientos(movimientos, jugadores, puntos) {
-  const reglas = {
-    Piedra: 'Tijera',
-    Tijera: 'Papel',
-    Papel: 'Piedra',
-  };
 
-  for (let i = 0; i < 5; i++) {
-    console.log("i vale: ", i);
-    const mov1 = movimientos[jugadores[0]][i];
-    const mov2 = movimientos[jugadores[1]][i];
-
-    console.log("mov1: ", mov1);
-    console.log("mov2: ", mov2);
-
-    console.log("reglas[mov1]: ",reglas[mov1]);
-
-    if (mov1 === mov2) {
-      // Empate
-      puntos[jugadores[0]] += 1;
-      puntos[jugadores[1]] += 1;
-    } else if (reglas[mov1] === mov2) {
-      // Jugador 1 gana
-      puntos[jugadores[0]] += 2;
-    } else {
-      // Jugador 2 gana
-      puntos[jugadores[1]] += 2;
-    }
-  }
-
-  // Crear un array con los resultados
-  return jugadores.map(jugadorId => ({
-    idJugador: jugadorId,
-    puntos: puntos[jugadorId],
-  }));
-}
-
-function analizarMovimientos2(movimientos, jugadores, puntos) {
-  // Ejemplo de los parámetros:
-  // movimientos = { _cHUsroWaBwKOSBRAAAH: [ 1, 3 ], nrNoR1fistaHRZmJAAAF: [ 4, 2 ] }
-  // jugadores = [ 'nrNoR1fistaHRZmJAAAF', '_cHUsroWaBwKOSBRAAAH' ]
-  // puntos = { nrNoR1fistaHRZmJAAAF: 0, _cHUsroWaBwKOSBRAAAH: 0 }
-
-  // Paso 1: Manipular los movimientos.
-  // Concatenar los valores de cada objeto para que no sea un array sino un valor numérico de 2 cifras.
   const movimientosConcatenados = Object.keys(movimientos).reduce((acc, jugadorId) => {
     const valorConcatenado = `${movimientos[jugadorId][0]}${movimientos[jugadorId][1]}`;
     acc[jugadorId] = parseInt(valorConcatenado); // Convertir el valor concatenado a número
@@ -116,25 +72,27 @@ function analizarMovimientos2(movimientos, jugadores, puntos) {
   const jugador1 = idsJugadores[0];
   const jugador2 = idsJugadores[1];
 
-  const valorJugador1 = movimientosConcatenados[jugador1];
-  const valorJugador2 = movimientosConcatenados[jugador2];
+  const valorJugador1 = movimientosConcatenados[jugador1] || 0;
+  const valorJugador2 = movimientosConcatenados[jugador2] || 0;
 
-  const diferencia = Math.abs(valorJugador1 - valorJugador2); // Diferencia entre los dos valores
+  // Diferencia entre los dos valores
+  const diferencia = Math.abs(valorJugador1 - valorJugador2);
 
   // Paso 3: El jugador con el valor mayor recibe la diferencia como puntos.
   if (valorJugador1 > valorJugador2) {
     puntos[jugador1] += diferencia; // Jugador 1 recibe la diferencia
   } else if (valorJugador2 > valorJugador1) {
     puntos[jugador2] += diferencia; // Jugador 2 recibe la diferencia
+  } else if (valorJugador2 === valorJugador1) {
+    puntos[jugador1] =  Math.floor(valorJugador1 / 2);
+    puntos[jugador2] = Math.floor(valorJugador2 / 2);
   }
 
-  // Crear un array con los resultados
   return jugadores.map(jugadorId => ({
     idJugador: jugadorId,
     puntos: puntos[jugadorId],
   }));
 }
-
 
 function finDelJuego(codigoSala, resultadoPuntos) {
   io.to(codigoSala).emit('se_finDelJuego', resultadoPuntos);
@@ -157,9 +115,9 @@ io.on('connection', (socket) => {
     salas[codigo] = {
       jugadores: [socket.id],
       puntos: { [socket.id]: 0 },
+      cantMov: { [socket.id]: 0 },
     };
     socket.join(codigo);
-    // console.log(`Sala creada: ${codigo}, Usuario: ${socket.id}`);
     callback(codigo);
     actualizarSalas();
   });
@@ -170,6 +128,7 @@ io.on('connection', (socket) => {
       if (salas[codigo].jugadores.length < 2) {
         salas[codigo].jugadores.push(socket.id);
         salas[codigo].puntos[socket.id] = 0;
+        salas[codigo].cantMov[socket.id] = 0;
         socket.join(codigo);
 
         if (salas[codigo].jugadores.length === 2) {
@@ -197,8 +156,8 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('jugadorListo', ({codigoSala, movimientos }) => {
-    // socket.id === jugador actual
+  socket.on('gameEmit_movimientoListo', ({codigoSala, movimientos, cantMovimientos}) => {
+
     if (!movimientosPorSala[codigoSala]) {
       movimientosPorSala[codigoSala] = {};
     }
@@ -207,57 +166,22 @@ io.on('connection', (socket) => {
     movimientosPorSala[codigoSala][socket.id] = movimientos;
 
     // Verificar si ambos jugadores han enviado sus movimientos
-    const { jugadores, puntos } = salas[codigoSala];
+    const { jugadores, puntos, cantMov } = salas[codigoSala];
+    cantMov[socket.id] = cantMovimientos;
 
     if (movimientosPorSala[codigoSala][jugadores[0]] && movimientosPorSala[codigoSala][jugadores[1]]) {
       const resultado = analizarMovimientos(movimientosPorSala[codigoSala], jugadores, puntos);
 
-      // Emitir el resultado de la ronda
-      io.to(codigoSala).emit('resultadoRonda', resultado);
+      io.to(codigoSala).emit('serverEmit_RondaLista', movimientosPorSala[codigoSala], resultado);
 
-      // Verificar si el juego ha terminado
-      if (puntos[jugadores[0]] >= 10 || puntos[jugadores[1]] >= 10) {
+      if(cantMov[jugadores[0]] === 0 && cantMov[jugadores[1]] === 0){
         finDelJuego(codigoSala, resultado);
       }
 
-      delete movimientosPorSala[codigoSala]; // Limpiar después de analizar
+      // Limpiar después de analizar
+      delete movimientosPorSala[codigoSala]; 
     } else {
-      //  jugadores[1]
-      const oponenteId = socket.id === jugadores[0] ? jugadores[1] : jugadores[0];
-      io.to(oponenteId).emit('visualOponenteListo');
-    }
-  });
-
-
-  socket.on('gameEmit_movimientoListo', ({codigoSala, movimientos}) => {
-
-    if (!movimientosPorSala[codigoSala]) {
-      movimientosPorSala[codigoSala] = {};
-    }
-
-    // Almacenar los movimientos del jugador
-    movimientosPorSala[codigoSala][socket.id] = movimientos;
-    // console.log("movimientosPorSala: ", movimientosPorSala);
-
-    // Verificar si ambos jugadores han enviado sus movimientos
-    const { jugadores, puntos } = salas[codigoSala];
-    // console.log(salas[codigoSala]);
-
-    if (movimientosPorSala[codigoSala][jugadores[0]] && movimientosPorSala[codigoSala][jugadores[1]]) {
-      const resultado = analizarMovimientos2(movimientosPorSala[codigoSala], jugadores, puntos);
-      // console.log(resultado);
-
-      // Emitir el resultado de la ronda
-      io.to(codigoSala).emit('serverEmit_RondaLista', movimientosPorSala[codigoSala], resultado);
-
-      // Verificar si el juego ha terminado
-      // if (puntos[jugadores[0]] >= 10 || puntos[jugadores[1]] >= 10) {
-      //   finDelJuego(codigoSala, resultado);
-      // }
-
-      delete movimientosPorSala[codigoSala]; // Limpiar después de analizar
-    } else {
-      // Emitir evento para jugador.
+      // Emitir evento para el oponente.
       const oponenteId = socket.id === jugadores[0] ? jugadores[1] : jugadores[0];
       io.to(oponenteId).emit('serverEmit_visualOponenteListo', ['?','?']);
     }

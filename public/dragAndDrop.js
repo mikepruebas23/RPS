@@ -38,9 +38,9 @@ export function toggleDragAndDrop(enable) {
   if (sortableInstances.length > 0) {
     sortableInstances.forEach((sortable) => {
       if (enable) {
-        sortable.option('disabled', false); // Habilitar
+        sortable.option('disabled', true); // Habilitar
       } else {
-        sortable.option('disabled', true); // Deshabilitar
+        sortable.option('disabled', false); // Deshabilitar
       }
     });
   }
@@ -88,42 +88,6 @@ function actualizarOrdenMovimientos() {
 
   movimientosGlobales = nuevoOrden;
 }
-
-export function obtenerMovimientosTablero_concatenado() {
-  const tablero = document.getElementById('tablero-mio');
-  const elementos = tablero.getElementsByClassName('movimiento'); // Obtener todos los elementos con clase 'movimiento'
-
-  // Recorrer los elementos y obtener los valores numéricos como cadenas
-  let resultado = '';
-  for (let i = 0; i < elementos.length; i++) {
-    const valor = parseInt(elementos[i].textContent.trim()); // Obtener el valor numérico
-    if (!isNaN(valor)) {  // Asegurarse de que el valor es un número válido
-      resultado += valor.toString();  // Concatenar el valor como cadena
-    }
-  }
-
-  // Convertir la cadena final en un número
-  return parseInt(resultado || 0);
-}
-
-export function obtenerMovimientosTablero() {
-  const tablero = document.getElementById('tablero-mio');
-  const elementos = tablero.getElementsByClassName('movimiento'); // Obtener todos los elementos con clase 'movimiento'
-
-  // Recorrer los elementos y obtener los valores numéricos
-  const valores = [];
-  for (let i = 0; i < elementos.length; i++) {
-    const valor = parseInt(elementos[i].textContent.trim()); // Usar textContent para obtener el texto y convertirlo a número
-    if (!isNaN(valor)) {  // Asegurarse de que el valor es un número válido
-      valores.push(valor);
-    }
-  }
-
-  return valores;
-}
-
-
-
 
 export function asignarMovimientos(movimientos){
   movimientosGlobales = movimientos;

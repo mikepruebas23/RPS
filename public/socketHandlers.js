@@ -1,9 +1,8 @@
-import { actualizarEstadoPartida, actualizarEstatusJugador, actualizarTempo, actualizarListaDeSalas, actualizarMovimientos, renderPuntuacionesRonda,
-  bloquearBtnListo, uiJuegoFinalizado, ESTATUS_JUEGO, ESTATUS_JUGADOR,
-  uiActualizarTablero
+import { actualizarEstadoPartida, actualizarEstatusJugador, actualizarTempo, actualizarListaDeSalas, actualizarMovimientos,
+  bloquearBtnListo, uiJuegoFinalizado, ESTATUS_JUEGO, ESTATUS_JUGADOR, actualizarEstatusTablero, ESTATUS_TABLERO
  } from './uiUpdates.js';
 
- import { asignarMovimientos } from './dragAndDrop.js';
+import { asignarMovimientos } from './dragAndDrop.js';
 
 
 export function setupSocketHandlers(socket) {
@@ -36,8 +35,6 @@ export function setupSocketHandlers(socket) {
     const { codigo, jugadores } = data;
     actualizarEstadoPartida(ESTATUS_JUEGO.SALA_LISTA);
     actualizarTempo();
-
-    // console.log(`La sala ${codigo} está lista para jugar con jugadores: ${jugadores.join(', ')}`);
   });
 
   // Actualizar temporizador
@@ -62,8 +59,9 @@ export function setupSocketHandlers(socket) {
 
   // Escuchar el evento cuando ambos jugadores estén listos
   socket.on("resultadoRonda", (resultado) => {
-    console.log(resultado);
-    renderPuntuacionesRonda(globalUsuarioId, resultado);
+    // console.log(resultado);
+    // renderPuntuacionesRonda(globalUsuarioId, resultado);
+    actualizarEstadoPartida(ESTATUS_JUEGO.MOSTRAR_PUNTOS, globalUsuarioId, resultado);
 
     if(estatusJuego != 'finalizado'){
       bloquearBtnListo(false);
@@ -88,9 +86,7 @@ export function setupSocketHandlers(socket) {
   });
 
   socket.on("serverEmit_visualOponenteListo", (movimientos) => {
-    // actualizarEstatusJugador(ESTATUS_JUGADOR.OP_MANO_LISTA);
-    // Ejemplo movimientos: [2,4]
-    uiActualizarTablero(movimientos);
+    actualizarEstatusTablero(ESTATUS_TABLERO.OPO_LISTO, movimientos);
   });
 
   // cuando los 2 jugadores ponen sus movimientos.
@@ -103,9 +99,15 @@ export function setupSocketHandlers(socket) {
   
     if (movimientoOponente) {
       const movimientos = totalMovimientos[movimientoOponente]; // Movimientos del oponente
-      console.log("Movimientos del oponente:", movimientos);
-      uiActualizarTablero(movimientos);
-      renderPuntuacionesRonda(globalUsuarioId, resultado);
+
+      actualizarEstatusTablero(ESTATUS_TABLERO.OPO_LISTO, movimientos);
+      // renderPuntuacionesRonda(globalUsuarioId, resultado);
+      actualizarEstadoPartida(ESTATUS_JUEGO.MOSTRAR_PUNTOS, globalUsuarioId, resultado);
+
+      setTimeout(() => {
+        actualizarEstatusTablero(ESTATUS_TABLERO.LIMPIAR);
+        actualizarEstatusTablero(ESTATUS_TABLERO.NUEVA_RONDA);
+      }, 3000);
     } else {
       console.error("No se encontró el ID contrario.");
     }

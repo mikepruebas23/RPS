@@ -43,8 +43,8 @@ body {
 
     .cont-resultados {
         font-size: 17px;
-        color: white;
-        background: #25253f;
+        color: #f9ff00;
+        background: #6c1717;
     }
 
     .fj-nombres {
@@ -65,7 +65,8 @@ body {
         border-bottom: 7px solid #e23b3b;
     }
     .pantalla-final {
-        background-image: url('../images/fondoFinal.jpg');
+        /* background-image: url('../images/fondoFinal.jpg'); */
+        background-color: #171717;
         background-size: cover;        /* Asegura que la imagen cubra todo el área */
         background-position: center;   /* Centra la imagen */
         background-repeat: no-repeat;  /* Evita que la imagen se repita */

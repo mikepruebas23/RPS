@@ -1,6 +1,6 @@
 import { setupSocketHandlers } from './socketHandlers.js';
 import { actualizarEstatusJugador, entrarEnSala, bloquearBtnListo, ocultarPantalla, ESTATUS_JUGADOR } from './uiUpdates.js';
-import { movimientosGlobales, obtenerMovimientosTablero, toggleDragAndDrop } from './dragAndDrop.js';
+import { toggleDragAndDrop } from './dragAndDrop.js';
 
 const socket = io();
 
@@ -29,6 +29,34 @@ export function unirseASala(codigoSala) {
       // mostrarErrorEnUI(respuesta.message); // Ejemplo de integración con uiUpdates.js
     }
   });
+}
+
+function obtenerMovimientosTablero() {
+  const tablero = document.getElementById('tablero-mio');
+  const elTablero = tablero.getElementsByClassName('movimiento'); // Obtener todos los elementos con clase 'movimiento'
+
+  const misMovimientos = document.getElementById('movimientos');
+  const elMisMovimientos = misMovimientos.getElementsByClassName('movimiento');
+
+  // Recorrer los elementos y obtener los valores numéricos de mi tablero
+  const valoresTablero = [];
+  for (let i = 0; i < elTablero.length; i++) {
+    const valorTab = parseInt(elTablero[i].textContent.trim()); // Usar textContent para obtener el texto y convertirlo a número
+    if (!isNaN(valorTab)) {
+      valoresTablero.push(valorTab);
+    }
+  }
+
+  // Recorrer los elementos y obtener los valores numéricos
+  const valoresMovimientos = [];
+  for (let i = 0; i < elMisMovimientos.length; i++) {
+    const valorMov = parseInt(elMisMovimientos[i].textContent.trim()); // Usar textContent para obtener el texto y convertirlo a número
+    if (!isNaN(valorMov)) {
+      valoresMovimientos.push(valorMov);
+    }
+  }
+
+  return {valoresTablero, valoresMovimientos};
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -62,35 +90,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Evento para bloquear el botón cuando el jugador está listo
   document.getElementById("btnListo").addEventListener("click", () => {
     // console.log(movimientosGlobales);
-    let total = obtenerMovimientosTablero();
-    // console.log(total);
+    const {valoresTablero, valoresMovimientos} = obtenerMovimientosTablero();
+    console.log(valoresTablero, valoresMovimientos.length);
   
-    // Verificar si 'total' es un número de 2 dígitos
-    if (total) {
-      toggleDragAndDrop(false);
-
-      // Código comentado: realizar las acciones deseadas si el total es de 2 dígitos
-      // socket.emit('jugadorListo', {
-      //   codigoSala: globalCodigoSala,
-      //   movimientos: movimientosGlobales,  // El orden de los movimientos del jugador
-      // });
+    if (valoresTablero) {
+      toggleDragAndDrop(true);
 
       // enviar mensaje y mano para el oponente.
       socket.emit('gameEmit_movimientoListo', {
         codigoSala: globalCodigoSala,
-        movimientos: total, 
+        movimientos: valoresTablero,
+        cantMovimientos: valoresMovimientos.length
       });
   
       actualizarEstatusJugador(ESTATUS_JUGADOR.MANO_LISTA);
-
-      // eliminar movimientos que sacamos.
-  
-      // Bloquear el botón
       bloquearBtnListo(true);
     } else {
       console.log("El total no es un número de dos dígitos.");
     }
   });
-
 
 });

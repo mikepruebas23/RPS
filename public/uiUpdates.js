@@ -4,6 +4,7 @@ import { unirseASala } from './game.js';
 const idUsuario = document.getElementById('usuario-id');
 const contLogo = document.getElementById('cont-logo');
 const contTablero = document.getElementById('cont-tablero');
+const contTemporizador = document.getElementById('cont-temporizador');
 const controlesIniciales = document.getElementById('controles-iniciales');
 const movimientosContainer = document.getElementById('movimientos-container');
 const contMensaje = document.getElementById('cont-mensaje');
@@ -21,7 +22,7 @@ const fjNombre1 = document.getElementById('fj-nombre1');
 const fjPuntos1 = document.getElementById('fj-puntos1');
 const fjNombre2 = document.getElementById('fj-nombre2');
 const fjPuntos2 = document.getElementById('fj-puntos2');
-const estadoPartida = document.getElementById('estado-partida');
+const estadoMensaje = document.getElementById('estado-mensaje');
 
 let pj1Puntos = 0;
 let pj2Puntos = 0;
@@ -32,7 +33,8 @@ const MENSAJES = {
 }
 
 export const ESTATUS_JUEGO = {
-  SALA_LISTA: 'sala_lista',
+  SALA_LISTA: 'SALA_LISTA',
+  MOSTRAR_PUNTOS: 'MOSTRAR_PUNTOS', 
   TEMP_GLOBAL_FIN: 'TEMP_FIN',
   TEMP_GLOBAL_INICIO: 'TEMP_INICIO'
 }
@@ -42,28 +44,34 @@ export const ESTATUS_JUGADOR = {
   OP_MANO_LISTA: 'OP_MANO_LISTA',
 }
 
-export function actualizarEstadoJugador(mensaje) {
-  if (estadoPartida) {
-    estadoPartida.innerHTML = `<p>${mensaje}</p>`;
-  }
+export const ESTATUS_TABLERO = {
+  LIMPIAR: 'LIMPIAR',
+  OPO_LISTO: 'OPO_LISTO',
+  NUEVA_RONDA: 'NUEVA_RONDA',
 }
 
-export function actualizarEstadoPartida(estatus) {
-  let mensaje = '';
-  if (estatus === 'sala_lista') {
-    salaJuego.classList.add('hidden');
-    mensaje = '';
-  }
-  estadoPartida.innerHTML = `<p>${mensaje}</p>`;
+function _actualizarEstadoMensaje(mensaje="") {
+  estadoMensaje.innerHTML = `<p>${mensaje}</p>`;
+}
+
+export function actualizarEstadoPartida(estatus, idJugador = null, resultado = null) {
 
   switch(estatus){
+    case ESTATUS_JUEGO.SALA_LISTA:
+      _MostrarOcultarDiv(salaJuego, 'add');
+      _actualizarEstadoMensaje();
+    break;
     case ESTATUS_JUEGO.TEMP_GLOBAL_FIN:
       _MostrarOcultarDiv(movimientosContainer,  'remove');
       _MostrarOcultarDiv(contbBtnListo, 'remove');
-      _MostrarOcultarDiv(contTablero, 'add');
+      _MostrarOcultarDiv(contTemporizador, 'add');
       _MostrarOcultarDiv(contLogo, 'add');
       _MostrarOcultarDiv(contNombres, 'remove');
       _MostrarOcultarDiv(contPuntaje, 'remove');
+      _MostrarOcultarDiv(contTablero,  'remove');
+    break;
+    case ESTATUS_JUEGO.MOSTRAR_PUNTOS:
+      _renderPuntuacionesRonda(idJugador, resultado);
     break;
   }
 }
@@ -81,13 +89,28 @@ export function actualizarEstatusJugador(estatus){
   }
 }
 
-export function uiActualizarTablero(movimientos) {
-  const tabOponente = document.getElementById('tablero-opo');
-
-  // Limpiar el tablero antes de agregar nuevos movimientos
-  while (tabOponente.firstChild) {
-    tabOponente.removeChild(tabOponente.firstChild);
+export function actualizarEstatusTablero(estatus, movimientos = null){
+  switch(estatus){
+    case ESTATUS_TABLERO.LIMPIAR:
+      uiLimpiarTablero('tablero-mio');
+      uiLimpiarTablero('tablero-opo');
+    break;
+    case ESTATUS_TABLERO.OPO_LISTO:
+      uiLimpiarTablero('tablero-opo');
+      uiActualizarMovimientosOponente(movimientos);
+    break;
+    case ESTATUS_TABLERO.NUEVA_RONDA:
+      bloquearBtnListo(false);
+      toggleDragAndDrop(false);
+    break;
   }
+}
+
+function uiActualizarMovimientosOponente(movimientos) {
+
+  uiLimpiarTablero('tablero-opo');
+
+  const tabOponente = document.getElementById('tablero-opo');
 
   // Iterar sobre los movimientos y agregar cada uno al tablero
   movimientos.forEach((movimiento) => {
@@ -99,7 +122,15 @@ export function uiActualizarTablero(movimientos) {
   });
 }
 
-  
+function uiLimpiarTablero(idElemento){
+  const tablero = document.getElementById(idElemento);
+
+  // Limpiar el tablero antes de agregar nuevos movimientos
+  while (tablero.firstChild) {
+    tablero.removeChild(tablero.firstChild);
+  }
+}
+
 export function mostrarJugadores(jugadores, oponenteId) {
   if (infoSala) {
     infoSala.innerHTML = `
@@ -127,12 +158,12 @@ export function entrarEnSala(codigo, mensaje="", iOpcion) {
     // Mostrar los IDs de los jugadores
     // Pendiente
     // mostrarJugadores(jugadores, oponenteId);
-    actualizarEstadoJugador(mensaje);
+    _actualizarEstadoMensaje(mensaje);
 };
 
 export function actualizarTempo(){
 
-  contTablero.classList.remove('hidden');
+  contTemporizador.classList.remove('hidden');
 }
 
 function _MostrarOcultarDiv(elemento, accion) {
@@ -182,7 +213,6 @@ export function actualizarMovimientos(movimientos) {
       .join('');
       
     initializeDragAndDrop();
-    // toggleDragAndDrop(false);
   } else {
     console.error('Elemento movimientos no encontrado.');
   }
@@ -203,7 +233,7 @@ function obtenerImagenMovimiento(mov){
   return `<img src="./images/${img}.svg" class="icono-movimiento" alt="icono smash" />`;
 }
 
-export function renderPuntuacionesRonda(idJugador, resultado){
+function _renderPuntuacionesRonda(idJugador, resultado){
   // idJugador = al jugador actual del soclet 
  
   const nombre1 = document.getElementById('nombre1');
@@ -218,11 +248,11 @@ export function renderPuntuacionesRonda(idJugador, resultado){
   
   for(let res of resultado){
     if(idJugador === res.idJugador){
-      pj1Puntos += res.puntos;
-      resultado1.textContent = pj1Puntos
+      pj1Puntos = res.puntos;
+      resultado1.textContent = pj1Puntos;
     }
     else {
-      pj2Puntos += res.puntos;
+      pj2Puntos = res.puntos;
       resultado2.textContent = pj2Puntos;
     }
   }
