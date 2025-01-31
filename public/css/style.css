@@ -28,6 +28,17 @@ input {
   margin: 10px;
 }
 
+#header {
+  position: fixed; /* Hace que el header se mantenga fijo en la parte superior */
+  top: 0; /* Lo coloca en la parte superior */
+  left: 0; /* Lo alinea a la izquierda */
+  width: 100%; /* Ocupa todo el ancho */
+  background-color: white; /* Ajusta el color de fondo para que no se mezcle con el contenido */
+  z-index: 1000; /* Asegura que quede sobre otros elementos */
+  text-align: center; /* Centra el contenido */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Agrega una sombra para destacar */
+}
+
 ._cont-iniciales {
   padding: 5px;
   margin: 0 auto;
@@ -86,7 +97,7 @@ input {
   justify-content: center;
   gap: 5px;
   padding: 10px;
-  background-color: #606d7b;
+  background-color: #dddddd;
   align-items: center;
   min-height: 17vh;
 }
@@ -128,7 +139,7 @@ input {
   color: var(--color-texto);
   transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
   font-family: 'blockHead', sans-serif;
-  border: 2px solid white;
+  border: 1.5px solid #000000;
 }
 
 .crear-sala {
@@ -154,18 +165,18 @@ input {
 }
 
 .nombre1 {
-  background: #2989ff;
+  background: #000000;
   padding: 15px;
   border-radius: 3px;
   color: white;
 }
 
 .btn-listo {
-  background: var(--color-secundario);
-  border-bottom: 7px solid #539a00;
+  background: #ffc603;
+  border-bottom: 4px solid #bd9300;
   width: 100px;
   height: 100px;
-  border-radius: 50%;
+  border-radius: 10%;
 }
 
 .btn-listo:hover {
@@ -200,7 +211,7 @@ input {
   border-bottom: 7px solid #7f7f7f;
   width: 100px;
   height: 100px;
-  border-radius: 50%;
+  border-radius: 10%;
 }
 
 .mi-turno{
@@ -211,12 +222,14 @@ input {
 }
 
 .cont-jugadores, .nombre-jugadores {
-  background: white;
+  background: #ffc603;
   display: flex;
   justify-content: space-around;
   align-items: center;
-  width: 90%;
-  margin: 0 auto;
+} 
+
+.cont-jugadores{
+  background: #e4b102;
 }
 
 #resultadoj1, #resultadoj2 {

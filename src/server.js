@@ -84,8 +84,8 @@ function analizarMovimientos(movimientos, jugadores, puntos) {
   } else if (valorJugador2 > valorJugador1) {
     puntos[jugador2] += diferencia; // Jugador 2 recibe la diferencia
   } else if (valorJugador2 === valorJugador1) {
-    puntos[jugador1] =  Math.floor(valorJugador1 / 2);
-    puntos[jugador2] = Math.floor(valorJugador2 / 2);
+    puntos[jugador1] +=  Math.floor(valorJugador1 / 2);
+    puntos[jugador2] += Math.floor(valorJugador2 / 2);
   }
 
   return jugadores.map(jugadorId => ({
@@ -115,7 +115,7 @@ io.on('connection', (socket) => {
     salas[codigo] = {
       jugadores: [socket.id],
       puntos: { [socket.id]: 0 },
-      cantMov: { [socket.id]: 0 },
+      cantMov: { [socket.id]: 10 },
     };
     socket.join(codigo);
     callback(codigo);
@@ -128,14 +128,11 @@ io.on('connection', (socket) => {
       if (salas[codigo].jugadores.length < 2) {
         salas[codigo].jugadores.push(socket.id);
         salas[codigo].puntos[socket.id] = 0;
-        salas[codigo].cantMov[socket.id] = 0;
+        salas[codigo].cantMov[socket.id] = 10;
         socket.join(codigo);
 
         if (salas[codigo].jugadores.length === 2) {
-          io.to(codigo).emit('salaLista', {
-            codigo,
-            jugadores: salas[codigo].jugadores,
-          });
+          io.to(codigo).emit('salaLista', {codigo, jugadores: salas[codigo].jugadores});
           iniciarTemporizadorSala(codigo);
         }
 
@@ -172,7 +169,7 @@ io.on('connection', (socket) => {
     if (movimientosPorSala[codigoSala][jugadores[0]] && movimientosPorSala[codigoSala][jugadores[1]]) {
       const resultado = analizarMovimientos(movimientosPorSala[codigoSala], jugadores, puntos);
 
-      io.to(codigoSala).emit('serverEmit_RondaLista', movimientosPorSala[codigoSala], resultado);
+      io.to(codigoSala).emit('serverEmit_RondaLista', movimientosPorSala[codigoSala], resultado, cantMov);
 
       if(cantMov[jugadores[0]] === 0 && cantMov[jugadores[1]] === 0){
         finDelJuego(codigoSala, resultado);
@@ -183,7 +180,7 @@ io.on('connection', (socket) => {
     } else {
       // Emitir evento para el oponente.
       const oponenteId = socket.id === jugadores[0] ? jugadores[1] : jugadores[0];
-      io.to(oponenteId).emit('serverEmit_visualOponenteListo', ['?','?']);
+      io.to(oponenteId).emit('serverEmit_tuOponenteListo', ['?','?'], cantMov[oponenteId]);
     }
   });
 

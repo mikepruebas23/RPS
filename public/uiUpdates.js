@@ -1,8 +1,9 @@
-import { initializeDragAndDrop, toggleDragAndDrop } from './dragAndDrop.js';
+import { initializeDragAndDrop } from './dragAndDrop.js';
 import { unirseASala } from './game.js';
 
 const idUsuario = document.getElementById('usuario-id');
 const contLogo = document.getElementById('cont-logo');
+const contHeader = document.getElementById('header');
 const contTablero = document.getElementById('cont-tablero');
 const contTemporizador = document.getElementById('cont-temporizador');
 const controlesIniciales = document.getElementById('controles-iniciales');
@@ -47,7 +48,9 @@ export const ESTATUS_JUGADOR = {
 export const ESTATUS_TABLERO = {
   LIMPIAR: 'LIMPIAR',
   OPO_LISTO: 'OPO_LISTO',
+  OPO_LISTO_AUTO: 'OPO_LISTO_AUTO',
   NUEVA_RONDA: 'NUEVA_RONDA',
+  NUEVA_RONDA_SIN_BTN: 'NUEVA_RONDA_SIN_BTN',
 }
 
 function _actualizarEstadoMensaje(mensaje="") {
@@ -69,6 +72,7 @@ export function actualizarEstadoPartida(estatus, idJugador = null, resultado = n
       _MostrarOcultarDiv(contNombres, 'remove');
       _MostrarOcultarDiv(contPuntaje, 'remove');
       _MostrarOcultarDiv(contTablero,  'remove');
+      _MostrarOcultarDiv(contHeader, 'remove');
     break;
     case ESTATUS_JUEGO.MOSTRAR_PUNTOS:
       _renderPuntuacionesRonda(idJugador, resultado);
@@ -85,6 +89,7 @@ export function actualizarEstatusJugador(estatus){
     case ESTATUS_JUGADOR.MANO_LISTA:
       _MostrarMensaje(pMensaje, MENSAJES.VACIO);
       _MostrarOcultarDiv(contMensaje,  'add');
+      bloquearBtnListo(true);
     break;
   }
 }
@@ -99,9 +104,20 @@ export function actualizarEstatusTablero(estatus, movimientos = null){
       uiLimpiarTablero('tablero-opo');
       uiActualizarMovimientosOponente(movimientos);
     break;
+    case ESTATUS_TABLERO.OPO_LISTO_AUTO:
+      uiLimpiarTablero('tablero-opo');
+      uiActualizarMovimientosOponente(movimientos);
+      actionAutoPaseTurno();
+    break;
     case ESTATUS_TABLERO.NUEVA_RONDA:
       bloquearBtnListo(false);
-      toggleDragAndDrop(false);
+      uiLimpiarTablero('tablero-mio');
+      uiLimpiarTablero('tablero-opo');
+    break;
+    case ESTATUS_TABLERO.NUEVA_RONDA_SIN_BTN:
+      // bloquearBtnListo(false);
+      uiLimpiarTablero('tablero-mio');
+      uiLimpiarTablero('tablero-opo');
     break;
   }
 }
@@ -129,6 +145,19 @@ function uiLimpiarTablero(idElemento){
   while (tablero.firstChild) {
     tablero.removeChild(tablero.firstChild);
   }
+}
+
+function actionAutoPaseTurno() {
+  setTimeout(() => {
+    const btnListo = document.getElementById("btnListo");
+    if (btnListo) {
+      btnListo.disabled = false; // Habilita el botón
+      btnListo.click(); // Simula un clic en el botón
+      console.log("Turno pasado automáticamente.");
+    } else {
+      console.warn("El botón btnListo no se encontró.");
+    }
+  }, 2000); // 3 segundos
 }
 
 export function mostrarJugadores(jugadores, oponenteId) {
@@ -162,7 +191,6 @@ export function entrarEnSala(codigo, mensaje="", iOpcion) {
 };
 
 export function actualizarTempo(){
-
   contTemporizador.classList.remove('hidden');
 }
 
@@ -244,7 +272,7 @@ function _renderPuntuacionesRonda(idJugador, resultado){
   nombre1.textContent = 'Tú';
   nombre2.textContent = 'Oponente';
 
-  console.log(idJugador, resultado);
+  // console.log(idJugador, resultado);
   
   for(let res of resultado){
     if(idJugador === res.idJugador){
@@ -289,7 +317,7 @@ export function uiJuegoFinalizado(idJugador, resultadoPuntos){
     }
   }
 
-  console.log(idJugador, resultadoPuntos);
+  // console.log(idJugador, resultadoPuntos);
 }
 
 export const ocultarPantalla = (idElemento) => {

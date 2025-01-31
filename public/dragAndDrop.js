@@ -1,46 +1,98 @@
 
 export let movimientosGlobales = [];
 export let sortableInstances = [];
+let tableroBloqueado = false;
 
-export function initializeDragAndDrop(options = {}) {
+// export function initializeDragAndDrop(options = {}) {
+//   const movimientosContainer = document.getElementById('movimientos');
+//   const tableroMio = document.getElementById('tablero-mio');
+
+//   // Inicializar SortableJS en los contenedores
+//   if (movimientosContainer) {
+//     const movimientosSortable = Sortable.create(movimientosContainer, {
+//       group: 'compartido',
+//       animation: 150,
+//       ...options, // Permite sobrescribir o añadir configuraciones
+//     });
+
+//     const tableroMioSortable = Sortable.create(tableroMio, {
+//       group: 'compartido',
+//       animation: 150,
+//       onAdd: (event) => {
+//         if (tableroMio.children.length > 2) {
+//           event.from.appendChild(event.item);
+//         }
+//       },
+//       onRemove: (event) => {
+//         if (tableroMio.children.length < 2) {
+//           return;
+//         }
+//       },
+//     });
+
+//     // Almacenar las instancias para poder controlarlas desde otro archivo
+//     sortableInstances = [movimientosSortable, tableroMioSortable];
+//   }
+// }
+export function initializeDragAndDrop(options = { 'disabled': true}) {
   const movimientosContainer = document.getElementById('movimientos');
   const tableroMio = document.getElementById('tablero-mio');
 
-  // Inicializar SortableJS en los contenedores
-  if (movimientosContainer) {
+  if (movimientosContainer && tableroMio) {
+    // Inicializar SortableJS
     const movimientosSortable = Sortable.create(movimientosContainer, {
       group: 'compartido',
       animation: 150,
-      ...options, // Permite sobrescribir o añadir configuraciones
+      ...options,
     });
 
     const tableroMioSortable = Sortable.create(tableroMio, {
       group: 'compartido',
       animation: 150,
+      ...options,
       onAdd: (event) => {
         if (tableroMio.children.length > 2) {
           event.from.appendChild(event.item);
         }
       },
-      onRemove: (event) => {
-        if (tableroMio.children.length < 2) {
-          return;
-        }
-      },
     });
 
-    // Almacenar las instancias para poder controlarlas desde otro archivo
     sortableInstances = [movimientosSortable, tableroMioSortable];
+
+    // Función para mover el elemento al otro contenedor
+    function moverElemento(elemento, destino) {
+      if (destino === tableroMio && tableroMio.children.length >= 2) return;
+      destino.appendChild(elemento);
+    }
+
+    // Evento de clic para mover elementos
+    function agregarEventoClick(contenedor, destino) {
+      contenedor.addEventListener("click", (event) => {
+        const elemento = event.target.closest(".movimiento");
+        if (elemento) {
+          if(!tableroBloqueado){
+            moverElemento(elemento, destino);
+          }
+        }
+      });
+    }
+
+    // Agregar eventos de clic
+    agregarEventoClick(movimientosContainer, tableroMio);
+    agregarEventoClick(tableroMio, movimientosContainer);
   }
 }
+
 
 export function toggleDragAndDrop(enable) {
   if (sortableInstances.length > 0) {
     sortableInstances.forEach((sortable) => {
       if (enable) {
-        sortable.option('disabled', true); // Habilitar
+        sortable.option('disabled', true); // Bloqueado
+        tableroBloqueado = true;
       } else {
-        sortable.option('disabled', false); // Deshabilitar
+        sortable.option('disabled', false); // Desbloqueado
+        tableroBloqueado = false;
       }
     });
   }

@@ -58,19 +58,6 @@ export function setupSocketHandlers(socket) {
   });
 
   // Escuchar el evento cuando ambos jugadores estén listos
-  socket.on("resultadoRonda", (resultado) => {
-    // console.log(resultado);
-    // renderPuntuacionesRonda(globalUsuarioId, resultado);
-    actualizarEstadoPartida(ESTATUS_JUEGO.MOSTRAR_PUNTOS, globalUsuarioId, resultado);
-
-    if(estatusJuego != 'finalizado'){
-      bloquearBtnListo(false);
-    }
-    // console.log(resultado);
-    // Aquí puedes activar la lógica de la fase de análisis o actualizar la UI
-  });
-
-  // Escuchar el evento cuando ambos jugadores estén listos
   socket.on("se_finDelJuego", (resultado) => {
     estatusJuego = 'finalizado';
     console.log("El juego a finalizado.");
@@ -85,28 +72,38 @@ export function setupSocketHandlers(socket) {
     actualizarEstatusJugador(ESTATUS_JUGADOR.OP_MANO_LISTA);
   });
 
-  socket.on("serverEmit_visualOponenteListo", (movimientos) => {
-    actualizarEstatusTablero(ESTATUS_TABLERO.OPO_LISTO, movimientos);
+  socket.on("serverEmit_tuOponenteListo", (movimientos, movRestantes) => {
+    if(movRestantes <= 0){
+      actualizarEstatusTablero(ESTATUS_TABLERO.OPO_LISTO_AUTO, movimientos);
+    } else {
+      actualizarEstatusTablero(ESTATUS_TABLERO.OPO_LISTO, movimientos);
+    }
   });
 
   // cuando los 2 jugadores ponen sus movimientos.
-  socket.on("serverEmit_RondaLista", (totalMovimientos, resultado) => {
+  socket.on("serverEmit_RondaLista", (totalMovimientos, resultado, cantMov) => {
+    // console.log(cantMov);
     // Obtener todos los IDs de los jugadores en la ronda
     const jugadores = Object.keys(totalMovimientos);
+    const movimientosRestantes = Object.keys(cantMov);
   
     // Buscar el ID contrario
     const movimientoOponente = jugadores.find(id => id !== globalUsuarioId);
+    const misMovimientos = movimientosRestantes.find(id => id === globalUsuarioId);
+    // console.log(misMovimientos);
   
     if (movimientoOponente) {
       const movimientos = totalMovimientos[movimientoOponente]; // Movimientos del oponente
 
       actualizarEstatusTablero(ESTATUS_TABLERO.OPO_LISTO, movimientos);
-      // renderPuntuacionesRonda(globalUsuarioId, resultado);
       actualizarEstadoPartida(ESTATUS_JUEGO.MOSTRAR_PUNTOS, globalUsuarioId, resultado);
 
       setTimeout(() => {
-        actualizarEstatusTablero(ESTATUS_TABLERO.LIMPIAR);
-        actualizarEstatusTablero(ESTATUS_TABLERO.NUEVA_RONDA);
+        if(cantMov[misMovimientos] <= 0){
+          actualizarEstatusTablero(ESTATUS_TABLERO.NUEVA_RONDA_SIN_BTN);
+        } else {
+          actualizarEstatusTablero(ESTATUS_TABLERO.NUEVA_RONDA);
+        }
       }, 3000);
     } else {
       console.error("No se encontró el ID contrario.");

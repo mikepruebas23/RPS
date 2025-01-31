@@ -1,6 +1,5 @@
 import { setupSocketHandlers } from './socketHandlers.js';
 import { actualizarEstatusJugador, entrarEnSala, bloquearBtnListo, ocultarPantalla, ESTATUS_JUGADOR } from './uiUpdates.js';
-import { toggleDragAndDrop } from './dragAndDrop.js';
 
 const socket = io();
 
@@ -89,13 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Evento para bloquear el botón cuando el jugador está listo
   document.getElementById("btnListo").addEventListener("click", () => {
-    // console.log(movimientosGlobales);
+    
     const {valoresTablero, valoresMovimientos} = obtenerMovimientosTablero();
-    console.log(valoresTablero, valoresMovimientos.length);
   
     if (valoresTablero) {
-      toggleDragAndDrop(true);
-
       // enviar mensaje y mano para el oponente.
       socket.emit('gameEmit_movimientoListo', {
         codigoSala: globalCodigoSala,
@@ -104,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   
       actualizarEstatusJugador(ESTATUS_JUGADOR.MANO_LISTA);
-      bloquearBtnListo(true);
     } else {
       console.log("El total no es un número de dos dígitos.");
     }

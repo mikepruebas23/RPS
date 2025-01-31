@@ -1,11 +1,11 @@
 .cont-tablero {
     width: 90%;
-    background: #606d7b;
-    /* height: 20vh; */
+    background: #515151;
+    border-radius: 5px;
 }
 
 .tablero-opo, .tablero-mio {
-    background: #4a5460;
+    background: #b1b1b1;
     height: 7vh;
     margin: 5px;
     display: flex;
@@ -13,6 +13,7 @@
     align-items: center;
     gap: 13px;
     font-size: 21px;
+    border-radius: 5px;
 }
 
 .movimiento-opo {
