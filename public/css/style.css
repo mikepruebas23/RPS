@@ -130,6 +130,7 @@ input {
 }
 
 .boton-sala {
+  font-family: 'blockHead', sans-serif;
   cursor: pointer;
   text-decoration: none;
   border-width: 1px;

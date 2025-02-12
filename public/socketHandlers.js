@@ -82,7 +82,7 @@ export function setupSocketHandlers(socket) {
 
   // cuando los 2 jugadores ponen sus movimientos.
   socket.on("serverEmit_RondaLista", (totalMovimientos, resultado, cantMov) => {
-    // console.log(cantMov);
+    console.log(resultado);
     // Obtener todos los IDs de los jugadores en la ronda
     const jugadores = Object.keys(totalMovimientos);
     const movimientosRestantes = Object.keys(cantMov);
@@ -108,6 +108,11 @@ export function setupSocketHandlers(socket) {
     } else {
       console.error("No se encontró el ID contrario.");
     }
+  });
+
+  socket.on("se_oponenteDesconectado", (idJugador) => {
+    console.log("OPONENTE DESCONECTADO", idJugador);
+    actualizarEstadoPartida(ESTATUS_JUEGO.DESCONECTADO);
   });
   
 }

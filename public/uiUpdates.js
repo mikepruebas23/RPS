@@ -1,4 +1,4 @@
-import { initializeDragAndDrop } from './dragAndDrop.js';
+import { initializeDragAndDrop, toggleDragAndDrop } from './dragAndDrop.js';
 import { unirseASala } from './game.js';
 
 const idUsuario = document.getElementById('usuario-id');
@@ -37,7 +37,8 @@ export const ESTATUS_JUEGO = {
   SALA_LISTA: 'SALA_LISTA',
   MOSTRAR_PUNTOS: 'MOSTRAR_PUNTOS', 
   TEMP_GLOBAL_FIN: 'TEMP_FIN',
-  TEMP_GLOBAL_INICIO: 'TEMP_INICIO'
+  TEMP_GLOBAL_INICIO: 'TEMP_INICIO',
+  DESCONECTADO: 'DESCONECTADO',
 }
 
 export const ESTATUS_JUGADOR = {
@@ -77,6 +78,10 @@ export function actualizarEstadoPartida(estatus, idJugador = null, resultado = n
     case ESTATUS_JUEGO.MOSTRAR_PUNTOS:
       _renderPuntuacionesRonda(idJugador, resultado);
     break;
+    case ESTATUS_JUEGO.DESCONECTADO: 
+      bloquearBtnListo(true);
+      toggleDragAndDrop(true);
+    break;
   }
 }
 
@@ -85,11 +90,13 @@ export function actualizarEstatusJugador(estatus){
     case ESTATUS_JUGADOR.OP_MANO_LISTA:
       _MostrarMensaje(pMensaje, MENSAJES.TOEL);
       _MostrarOcultarDiv(contMensaje,  'remove');
+      
     break;
     case ESTATUS_JUGADOR.MANO_LISTA:
       _MostrarMensaje(pMensaje, MENSAJES.VACIO);
       _MostrarOcultarDiv(contMensaje,  'add');
       bloquearBtnListo(true);
+      toggleDragAndDrop(true);
     break;
   }
 }
@@ -110,6 +117,7 @@ export function actualizarEstatusTablero(estatus, movimientos = null){
       actionAutoPaseTurno();
     break;
     case ESTATUS_TABLERO.NUEVA_RONDA:
+      toggleDragAndDrop(false);
       bloquearBtnListo(false);
       uiLimpiarTablero('tablero-mio');
       uiLimpiarTablero('tablero-opo');
@@ -178,7 +186,7 @@ export function entrarEnSala(codigo, mensaje="", iOpcion) {
     if(iOpcion === 1){ 
       // Muestra la interfaz de la sala de juego
       salaJuego.classList.remove('hidden');
-      // infoSala.textContent = `Estás en la sala: ${codigo}`;
+      infoSala.textContent = `SALA: ${codigo}`;
     }
     else {
       salaJuego.classList.add('hidden'); 
@@ -212,7 +220,7 @@ export function actualizarListaDeSalas(salas) {
   // }
 
   if (salas.length === 0) {
-      contenedorSalas.innerHTML = '<p id="titulo-listado">No hay salas disponibles</p>';
+      contenedorSalas.innerHTML = '<p id="titulo-listado">Ninguna</p>';
   } else {
     contenedorSalas.innerHTML = '';
     salas.forEach(({ codigo, usuarios }) => {
@@ -222,7 +230,7 @@ export function actualizarListaDeSalas(salas) {
       btnUnirse.textContent = 'unirse';
       btnUnirse.classList.add('btn-unirse');
       btnUnirse.addEventListener('click', () => unirseASala(codigo)); // Correcto
-      salaItem.textContent = `Sala: ${codigo} | Jugadores: ${usuarios}`;
+      salaItem.textContent = `Sala: ${codigo}`;
       
       contenedorSalas.appendChild(salaItem);
       contenedorSalas.appendChild(btnUnirse);

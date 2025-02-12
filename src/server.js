@@ -111,7 +111,7 @@ io.on('connection', (socket) => {
 
   // Crear Sala
   socket.on('crearSala', (callback) => {
-    const codigo = Math.random().toString(36).substr(2, 6).toUpperCase();
+    const codigo = Math.random().toString(36).substr(2, 5).toUpperCase();
     salas[codigo] = {
       jugadores: [socket.id],
       puntos: { [socket.id]: 0 },
@@ -187,14 +187,24 @@ io.on('connection', (socket) => {
   // Desconexión
   socket.on('disconnect', () => {
     console.log(`Usuario desconectado: ${socket.id}`);
+  
     for (const codigo in salas) {
+      // Filtrar jugadores y eliminar al desconectado
       salas[codigo].jugadores = salas[codigo].jugadores.filter(id => id !== socket.id);
+  
       if (salas[codigo].jugadores.length === 0) {
+        // Si la sala queda vacía, eliminarla
         delete salas[codigo];
+      } else if (salas[codigo].jugadores.length === 1) {
+        // Si queda solo un jugador, notificarle que su oponente se desconectó
+        socket.to(salas[codigo].jugadores[0]).emit('se_oponenteDesconectado', salas[codigo].jugadores[0]);
       }
     }
+  
     actualizarSalas();
   });
+
+  // fin
 });
 
 const PORT = 3000;
