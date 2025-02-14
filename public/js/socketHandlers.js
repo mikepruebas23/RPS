@@ -111,8 +111,8 @@ export function setupSocketHandlers(socket) {
   });
 
   socket.on("se_oponenteDesconectado", (idJugador) => {
-    console.log("OPONENTE DESCONECTADO", idJugador);
     actualizarEstadoPartida(ESTATUS_JUEGO.DESCONECTADO);
+    console.log("OPONENTE DESCONECTADO", idJugador);
   });
   
 }

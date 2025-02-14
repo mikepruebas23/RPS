@@ -1,8 +1,14 @@
+import { alert_mensaje } from './alerts.js';
 import { setupSocketHandlers } from './socketHandlers.js';
-import { actualizarEstatusJugador, entrarEnSala, bloquearBtnListo, ocultarPantalla, ESTATUS_JUGADOR } from './uiUpdates.js';
+import { actualizarEstatusJugador, entrarEnSala, actualizarEstadoPartida, ocultarPantalla, ESTATUS_JUGADOR, ESTATUS_JUEGO } from './uiUpdates.js';
+
+// import Swal from 'sweetalert2';
+
+// or via CommonJS
+// const Swal = require('sweetalert2');
+
 
 const socket = io();
-
 // codigos
 // entrar sala , 1 en crear, 2 en unirseSala
 
@@ -13,6 +19,7 @@ function crearSala() {
     globalCodigoSala = codigo;
     ocultarPantalla('controles-iniciales');
     entrarEnSala(codigo, "Esperando jugador...", 1);
+    actualizarEstadoPartida(ESTATUS_JUEGO.CREAR_SALA);
   });
 }
 
@@ -24,6 +31,7 @@ export function unirseASala(codigoSala) {
       globalCodigoSala = respuesta.codigo;
     } else {
       console.error(respuesta.message);
+      alert_mensaje(respuesta.message);
       // Aquí puedes agregar una función para mostrar el error en la interfaz
       // mostrarErrorEnUI(respuesta.message); // Ejemplo de integración con uiUpdates.js
     }
@@ -104,5 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log("El total no es un número de dos dígitos.");
     }
   });
+
+  actualizarEstadoPartida(ESTATUS_JUEGO.INICIO);
 
 });

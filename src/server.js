@@ -40,6 +40,8 @@ function iniciarTemporizadorSala(codigoSala) {
       delete timers[codigoSala];
       io.to(codigoSala).emit('temporizadorFinalizado');
 
+      salas[codigoSala].estatus = 'jugando';
+
       const { jugadores } = salas[codigoSala];
       const [jugador1Id, jugador2Id] = jugadores;
 
@@ -95,6 +97,7 @@ function analizarMovimientos(movimientos, jugadores, puntos) {
 }
 
 function finDelJuego(codigoSala, resultadoPuntos) {
+  salas[codigoSala].estatus = 'terminado';
   io.to(codigoSala).emit('se_finDelJuego', resultadoPuntos);
 }
 
@@ -116,6 +119,7 @@ io.on('connection', (socket) => {
       jugadores: [socket.id],
       puntos: { [socket.id]: 0 },
       cantMov: { [socket.id]: 10 },
+      estatus: 'esperando'
     };
     socket.join(codigo);
     callback(codigo);
@@ -132,6 +136,8 @@ io.on('connection', (socket) => {
         socket.join(codigo);
 
         if (salas[codigo].jugadores.length === 2) {
+          salas[codigo].estatus = '';
+          // console.log("salas: ",salas[codigo]);
           io.to(codigo).emit('salaLista', {codigo, jugadores: salas[codigo].jugadores});
           iniciarTemporizadorSala(codigo);
         }
@@ -186,18 +192,23 @@ io.on('connection', (socket) => {
 
   // Desconexión
   socket.on('disconnect', () => {
-    console.log(`Usuario desconectado: ${socket.id}`);
+    // console.log(`Usuario desconectado: ${socket.id}`);
   
     for (const codigo in salas) {
+      // console.log("codigo: ",codigo);
+      console.log("salas: ",salas);
       // Filtrar jugadores y eliminar al desconectado
       salas[codigo].jugadores = salas[codigo].jugadores.filter(id => id !== socket.id);
   
       if (salas[codigo].jugadores.length === 0) {
+        // console.log("salas[codigo] if: ", salas[codigo]);
         // Si la sala queda vacía, eliminarla
         delete salas[codigo];
-      } else if (salas[codigo].jugadores.length === 1) {
+      } else if (salas[codigo].jugadores.length === 1 && salas[codigo].estatus !== 'esperando') {
+        // console.log("salas[codigo] else if: ", salas[codigo]);
         // Si queda solo un jugador, notificarle que su oponente se desconectó
         socket.to(salas[codigo].jugadores[0]).emit('se_oponenteDesconectado', salas[codigo].jugadores[0]);
+        delete salas[codigo];
       }
     }
   

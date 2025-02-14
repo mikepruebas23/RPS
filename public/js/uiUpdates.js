@@ -3,6 +3,8 @@ import { unirseASala } from './game.js';
 
 const idUsuario = document.getElementById('usuario-id');
 const contLogo = document.getElementById('cont-logo');
+const contBienvenido = document.getElementById('bienvenido');
+const contGuardarnombre = document.getElementById('cont-guardarnombre');
 const contHeader = document.getElementById('header');
 const contTablero = document.getElementById('cont-tablero');
 const contTemporizador = document.getElementById('cont-temporizador');
@@ -19,6 +21,7 @@ const contbBtnListo = document.getElementById('cont-btn');
 const btnListo = document.getElementById('btnListo');
 const contJuego = document.getElementById('cont-juego');
 const contFinJuego = document.getElementById('cont-finjuego');
+const contFinJuegoDq = document.getElementById('cont-finjuego-dq');
 const fjNombre1 = document.getElementById('fj-nombre1');
 const fjPuntos1 = document.getElementById('fj-puntos1');
 const fjNombre2 = document.getElementById('fj-nombre2');
@@ -34,6 +37,8 @@ const MENSAJES = {
 }
 
 export const ESTATUS_JUEGO = {
+  INICIO: 'INICIO',
+  CREAR_SALA: 'CREAR_SALA',
   SALA_LISTA: 'SALA_LISTA',
   MOSTRAR_PUNTOS: 'MOSTRAR_PUNTOS', 
   TEMP_GLOBAL_FIN: 'TEMP_FIN',
@@ -54,6 +59,23 @@ export const ESTATUS_TABLERO = {
   NUEVA_RONDA_SIN_BTN: 'NUEVA_RONDA_SIN_BTN',
 }
 
+function uiActualizarNombre() {
+  const tagname = localStorage.getItem('flip43_tagname') || null;
+  if (tagname) {
+    if (contBienvenido) {
+
+      // Eliminar cualquier elemento hijo antes de agregar uno nuevo
+      while (contBienvenido.firstChild) {
+        contBienvenido.removeChild(contBienvenido.firstChild);
+      }
+
+      const p = document.createElement('p');
+      p.textContent = `Hola, ${tagname}`;
+      contBienvenido.appendChild(p);
+    }
+  }
+}
+
 function _actualizarEstadoMensaje(mensaje="") {
   estadoMensaje.innerHTML = `<p>${mensaje}</p>`;
 }
@@ -61,6 +83,13 @@ function _actualizarEstadoMensaje(mensaje="") {
 export function actualizarEstadoPartida(estatus, idJugador = null, resultado = null) {
 
   switch(estatus){
+    case ESTATUS_JUEGO.INICIO:
+      uiActualizarNombre();
+    break;
+    case ESTATUS_JUEGO.CREAR_SALA:
+      _MostrarOcultarDiv(contBienvenido, 'add');
+      _MostrarOcultarDiv(contGuardarnombre, 'add');
+    break;
     case ESTATUS_JUEGO.SALA_LISTA:
       _MostrarOcultarDiv(salaJuego, 'add');
       _actualizarEstadoMensaje();
@@ -81,6 +110,10 @@ export function actualizarEstadoPartida(estatus, idJugador = null, resultado = n
     case ESTATUS_JUEGO.DESCONECTADO: 
       bloquearBtnListo(true);
       toggleDragAndDrop(true);
+      uiLimpiarTablero('tablero-mio');
+      uiLimpiarTablero('tablero-opo');
+      _MostrarOcultarDiv(contFinJuegoDq, 'remove');
+      _MostrarOcultarDiv(contJuego, 'add');
     break;
   }
 }
@@ -123,7 +156,6 @@ export function actualizarEstatusTablero(estatus, movimientos = null){
       uiLimpiarTablero('tablero-opo');
     break;
     case ESTATUS_TABLERO.NUEVA_RONDA_SIN_BTN:
-      // bloquearBtnListo(false);
       uiLimpiarTablero('tablero-mio');
       uiLimpiarTablero('tablero-opo');
     break;
@@ -214,28 +246,29 @@ export function actualizarListaDeSalas(salas) {
   const tituloSalas = document.getElementById('titulo-listado');
   const contenedorSalas = document.getElementById('contenedor-sala');
 
-  // if (!tituloSalas || !contenedorSalas) {
-  //   console.error('Elementos de la lista de salas no encontrados.');
-  //   return;
-  // }
-
+  console.log(salas);
   if (salas.length === 0) {
       contenedorSalas.innerHTML = '<p id="titulo-listado">Ninguna</p>';
   } else {
     contenedorSalas.innerHTML = '';
     salas.forEach(({ codigo, usuarios }) => {
-      const salaItem = document.createElement('p');
-      const btnUnirse = document.createElement('button');
-      
-      btnUnirse.textContent = 'unirse';
-      btnUnirse.classList.add('btn-unirse');
-      btnUnirse.addEventListener('click', () => unirseASala(codigo)); // Correcto
-      salaItem.textContent = `Sala: ${codigo}`;
-      
-      contenedorSalas.appendChild(salaItem);
-      contenedorSalas.appendChild(btnUnirse);
+      if(usuarios < 2){
+
+        const salaItem = document.createElement('p');
+        const btnUnirse = document.createElement('button');
+        
+        btnUnirse.textContent = 'unirse';
+        btnUnirse.classList.add('btn-unirse');
+        btnUnirse.addEventListener('click', () => unirseASala(codigo)); // Correcto
+        salaItem.textContent = `Sala: ${codigo}`;
+        
+        contenedorSalas.appendChild(salaItem);
+        contenedorSalas.appendChild(btnUnirse);
+      }
+      else {
+        contenedorSalas.innerHTML = '<p id="titulo-listado">En partida</p>';
+      }
     });
-    
   }
 }
   
@@ -244,7 +277,6 @@ export function actualizarMovimientos(movimientos) {
   if (contenedorMovimientos) {
     // Meter los movimientos en su imagen correspondiente.
     contenedorMovimientos.innerHTML = movimientos
-      // .map((movimiento) => `<div class="movimiento">${obtenerImagenMovimiento(movimiento)}</div>`)
       .map((movimiento) => `<div class="movimiento">${movimiento}</div>`)
       .join('');
       
@@ -252,21 +284,6 @@ export function actualizarMovimientos(movimientos) {
   } else {
     console.error('Elemento movimientos no encontrado.');
   }
-}
-
-function obtenerImagenMovimiento(mov){
-  let img = '';
-  if(mov === "Piedra"){
-    img = 'smash';
-  }
-  else if(mov === 'Tijera'){
-    img = 'sword';
-  } 
-  else {
-    img = 'shield';
-  }
-
-  return `<img src="./images/${img}.svg" class="icono-movimiento" alt="icono smash" />`;
 }
 
 function _renderPuntuacionesRonda(idJugador, resultado){

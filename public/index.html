@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="./css/board.css">
   <!-- CDN de SortableJS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div id="cont-juego" class="cont-juego">
@@ -24,6 +25,10 @@
             <image src="./images/logo.svg" width="150px" heith="150px" alt="logo"/>
         </div>
 
+        <div id="bienvenido">
+            
+        </div>
+
         <div id="controles-iniciales" class="_cont-iniciales">
             <button id="crear" class="crear-sala boton-sala">Crear Sala</button>
             <!-- <input id="codigo" placeholder="Código de Sala" autocomplete="false"> -->
@@ -35,6 +40,10 @@
             <div id="contenedor-sala" class="contenedor-sala">
                 <p id="titulo-listado">Ninguna</p>
             </div>
+        </div>
+
+        <div id="cont-guardarnombre">
+            <button onclick="guardarNombre()">Crear nombre</button>
         </div>
 
         <div id="sala-juego" class="hidden">
@@ -88,6 +97,14 @@
         </div>
     </div>
 
+    <!-- Pantalla win por DQ -->
+    <div id="cont-finjuego-dq" class="fin-juego-dq hidden pantalla-final-dq">
+        <div class="elementos-dq">
+            <p>Ganaste por DQ.</p>
+        </div>
+        <button id="btn-reiniciar" onclick="window.location.reload();">Inicio</button>
+    </div>
+
     <div id="cont-finjuego" class="fin-juego hidden pantalla-final">
         <div class="cont-elementos">
             <div class="cont-resultados">
@@ -108,9 +125,10 @@
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    <script src="socketHandlers.js" type="module"></script>
-    <script src="uiUpdates.js" type="module"></script>
-    <script src="dragAndDrop.js" type="module"></script>
-    <script src="game.js" type="module"></script>
+    <script src="js/socketHandlers.js" type="module"></script>
+    <script src="js/uiUpdates.js" type="module"></script>
+    <script src="js/dragAndDrop.js" type="module"></script>
+    <script src="js/game.js" type="module"></script>
+    <script src="js/alerts.js"  type="module"></script>
 </body>
 </html>
