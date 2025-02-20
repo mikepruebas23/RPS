@@ -245,29 +245,33 @@ function _MostrarMensaje(elemento, mensaje){
 export function actualizarListaDeSalas(salas) {
   const tituloSalas = document.getElementById('titulo-listado');
   const contenedorSalas = document.getElementById('contenedor-sala');
-
+  
   console.log(salas);
   if (salas.length === 0) {
-      contenedorSalas.innerHTML = '<p id="titulo-listado">Ninguna</p>';
+    contenedorSalas.innerHTML = '<p id="titulo-listado">Ninguna</p>';
   } else {
     contenedorSalas.innerHTML = '';
     salas.forEach(({ codigo, usuarios }) => {
+      const salaItems = document.createElement('div');
+      
+      const salaItem = document.createElement('p');
+      const btnUnirse = document.createElement('button');
       if(usuarios < 2){
-
-        const salaItem = document.createElement('p');
-        const btnUnirse = document.createElement('button');
         
         btnUnirse.textContent = 'unirse';
         btnUnirse.classList.add('btn-unirse');
+        salaItems.classList.add('contenedor-sala-items');
         btnUnirse.addEventListener('click', () => unirseASala(codigo)); // Correcto
         salaItem.textContent = `Sala: ${codigo}`;
-        
-        contenedorSalas.appendChild(salaItem);
-        contenedorSalas.appendChild(btnUnirse);
+
+        salaItems.appendChild(salaItem);
+        salaItems.appendChild(btnUnirse);
+        contenedorSalas.appendChild(salaItems);
       }
       else {
         contenedorSalas.innerHTML = '<p id="titulo-listado">En partida</p>';
       }
+      
     });
   }
 }
@@ -294,7 +298,7 @@ function _renderPuntuacionesRonda(idJugador, resultado){
   const resultado1 = document.getElementById('resultadoj1');
   const resultado2 = document.getElementById('resultadoj2');
 
-  nombre1.textContent = 'Tú';
+  nombre1.textContent = localStorage.getItem('flip43_tagname') || 'Tú';
   nombre2.textContent = 'Oponente';
 
   // console.log(idJugador, resultado);
@@ -333,7 +337,7 @@ export function uiJuegoFinalizado(idJugador, resultadoPuntos){
 
   for(let res of resultadoPuntos){
     if(idJugador === res.idJugador){
-      fjNombre1.textContent = "Tú";
+      fjNombre1.textContent = localStorage.getItem('flip43_tagname') || "Tú";
       fjPuntos1.textContent = res.puntos;
     }
     else {

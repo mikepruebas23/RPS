@@ -4,7 +4,6 @@ import { actualizarEstadoPartida, actualizarEstatusJugador, actualizarTempo, act
 
 import { asignarMovimientos } from './dragAndDrop.js';
 
-
 export function setupSocketHandlers(socket) {
   
   let globalUsuarioId;
@@ -66,7 +65,6 @@ export function setupSocketHandlers(socket) {
     // console.log(resultado);
     // Aquí puedes activar la lógica de la fase de análisis o actualizar la UI
   });
-
 
   socket.on("visualOponenteListo", () => {
     actualizarEstatusJugador(ESTATUS_JUGADOR.OP_MANO_LISTA);

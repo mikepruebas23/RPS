@@ -7,6 +7,4 @@ meter alguna validaicon para que los penalice o les de dq.
 # Mandar mensaje al jugador cuando ya no tienes movimientos y solo estas en espera de que tu oponente ponga algo.
 
 # Si el usuario se desconecta.
-OK bloquear tablero
-OK bloquear numeros.
-Fata Limpiar tablero regresando numero o numeros a la mano.
+se manda directo a pantalla de dq, falta eliminar la sala.

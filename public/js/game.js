@@ -2,11 +2,6 @@ import { alert_mensaje } from './alerts.js';
 import { setupSocketHandlers } from './socketHandlers.js';
 import { actualizarEstatusJugador, entrarEnSala, actualizarEstadoPartida, ocultarPantalla, ESTATUS_JUGADOR, ESTATUS_JUEGO } from './uiUpdates.js';
 
-// import Swal from 'sweetalert2';
-
-// or via CommonJS
-// const Swal = require('sweetalert2');
-
 
 const socket = io();
 // codigos
@@ -29,11 +24,10 @@ export function unirseASala(codigoSala) {
     if (respuesta.success) {
       entrarEnSala(codigoSala, " ", 2);
       globalCodigoSala = respuesta.codigo;
+      actualizarEstadoPartida(ESTATUS_JUEGO.CREAR_SALA);
     } else {
       console.error(respuesta.message);
       alert_mensaje(respuesta.message);
-      // Aquí puedes agregar una función para mostrar el error en la interfaz
-      // mostrarErrorEnUI(respuesta.message); // Ejemplo de integración con uiUpdates.js
     }
   });
 }
@@ -80,20 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     botonCrear.addEventListener('click', crearSala);
   }
 
-  // !Configurar botón para unirse a sala
-  if (botonUnirse) {
-    botonUnirse.addEventListener('click', () => {
-      const codigoSala = codigoSalaSeleccionada.value.trim(); // Eliminar espacios en blanco
-      if (codigoSala.length > 0) {
-        unirseASala(codigoSala);
-      } else {
-        console.log('El código de la sala no puede estar vacío.');
-        // Puedes agregar un mensaje en la interfaz para informar al usuario
-        // mostrarErrorEnUI('El código de la sala no puede estar vacío.');
-      }
-    });
-  }
-
   // Evento para bloquear el botón cuando el jugador está listo
   document.getElementById("btnListo").addEventListener("click", () => {
     
@@ -112,6 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log("El total no es un número de dos dígitos.");
     }
   });
+
+  const nombre1 = document.getElementById('nombre1');
+  nombre1.innerHTML = localStorage.getItem('flip43_tagname') || "Tú";
 
   actualizarEstadoPartida(ESTATUS_JUEGO.INICIO);
 
