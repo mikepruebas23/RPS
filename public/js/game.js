@@ -1,4 +1,4 @@
-import { alert_mensaje } from './alerts.js';
+import { movimientosGlobales } from './dragAndDrop.js';
 import { setupSocketHandlers } from './socketHandlers.js';
 import { actualizarEstatusJugador, entrarEnSala, actualizarEstadoPartida, ocultarPantalla, ESTATUS_JUGADOR, ESTATUS_JUEGO } from './uiUpdates.js';
 
@@ -27,12 +27,40 @@ export function unirseASala(codigoSala) {
       actualizarEstadoPartida(ESTATUS_JUEGO.CREAR_SALA);
     } else {
       console.error(respuesta.message);
-      alert_mensaje(respuesta.message);
     }
   });
 }
 
 function obtenerMovimientosTablero() {
+  // console.log(movimientosGlobales); 
+  const tablero = document.getElementById('tablero-mio');
+  const elTablero = tablero.getElementsByClassName('naipe');
+
+  const valoresTablero = Array.from(elTablero).map(elemento => {
+    const valorAlt = parseInt(elemento.alt, 10);
+    const movimiento = movimientosGlobales.find(mov => mov.valor === valorAlt);
+    return movimiento ? movimiento.valor : null; 
+  }).filter(valor => valor !== null); // Filtramos valores nulos
+
+  const misMovimientos = document.getElementById('movimientos');
+  const elMisMovimientos = misMovimientos.getElementsByClassName('naipe');
+
+  const valoresMovimientos = Array.from(elMisMovimientos).map(elemento => {
+    return  parseInt(elemento.alt, 10);
+  });
+  // const valoresMovimientos = [];
+  // for (let i = 0; i < elMisMovimientos.length; i++) {
+  //   const valorMov = parseInt(elMisMovimientos[i].textContent.trim()); // Usar textContent para obtener el texto y convertirlo a número
+  //   if (!isNaN(valorMov)) {
+  //     valoresMovimientos.push(valorMov);
+  //   }
+  // }
+  // console.log(valoresTablero);
+  return {valoresTablero, valoresMovimientos};
+}
+
+
+function obtenerMovimientosTablero_Respaldo() {
   const tablero = document.getElementById('tablero-mio');
   const elTablero = tablero.getElementsByClassName('movimiento'); // Obtener todos los elementos con clase 'movimiento'
 
@@ -60,6 +88,13 @@ function obtenerMovimientosTablero() {
   return {valoresTablero, valoresMovimientos};
 }
 
+function obtenerValorDelTurno() {
+  const turnoLeft = document.getElementById("cant-turnoPass");
+  const valorTurno = turnoLeft ? parseInt(turnoLeft.textContent, 10) || 0 : 0;
+  return {valorTurno};
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
   // Configurar los manejadores de socket
   setupSocketHandlers(socket);
@@ -77,20 +112,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // Evento para bloquear el botón cuando el jugador está listo
   document.getElementById("btnListo").addEventListener("click", () => {
     
+    const {valorTurno} = obtenerValorDelTurno();
     const {valoresTablero, valoresMovimientos} = obtenerMovimientosTablero();
-  
-    if (valoresTablero) {
-      // enviar mensaje y mano para el oponente.
-      socket.emit('gameEmit_movimientoListo', {
-        codigoSala: globalCodigoSala,
-        movimientos: valoresTablero,
-        cantMovimientos: valoresMovimientos.length
-      });
-  
-      actualizarEstatusJugador(ESTATUS_JUGADOR.MANO_LISTA);
+    console.log(valoresMovimientos);
+    if(valorTurno >= 1){
+      if (valoresTablero) {
+        // enviar mensaje y mano para el oponente.
+        socket.emit('gameEmit_movimientoListo', {
+          codigoSala: globalCodigoSala,
+          movimientos: valoresTablero,
+          cantMovimientos: valoresMovimientos.length
+        });
+    
+        actualizarEstatusJugador(ESTATUS_JUGADOR.MANO_LISTA);
+      } 
+      else {
+        console.log("El total no es un número de dos dígitos.");
+      }
     } else {
-      console.log("El total no es un número de dos dígitos.");
+      console.log("Ya no puedes pasar de turno.");
     }
+    
   });
 
   const nombre1 = document.getElementById('nombre1');

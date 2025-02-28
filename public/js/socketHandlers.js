@@ -80,7 +80,9 @@ export function setupSocketHandlers(socket) {
 
   // cuando los 2 jugadores ponen sus movimientos.
   socket.on("serverEmit_RondaLista", (totalMovimientos, resultado, cantMov) => {
+    // console.log(totalMovimientos);
     console.log(resultado);
+    // console.log(cantMov);
     // Obtener todos los IDs de los jugadores en la ronda
     const jugadores = Object.keys(totalMovimientos);
     const movimientosRestantes = Object.keys(cantMov);

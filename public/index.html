@@ -43,7 +43,7 @@
         </div>
 
         <div id="cont-guardarnombre">
-            <button onclick="guardarNombre()">Crear nombre</button>
+            <button id="btn-guardar-nombre">Crear nombre</button>
         </div>
 
         <div id="sala-juego" class="hidden">
@@ -80,11 +80,19 @@
         <div id="cont-tablero" class=" hidden cont-tablero">
             <div id="tablero-opo" class="tablero-opo"></div>
             <div id="tablero-mio" class="tablero-mio"></div>
+            <!-- <div id="tablero-mio" class="tablero-test">
+                <img src="./images/naipe.png" alt="img"  class="img-card"/>
+            </div> -->
         </div>
 
         <!-- Contenedor de movimientos con drag-and-drop -->
         <div id="movimientos-container" class="hidden">
             <h2>Tus Movimientos</h2>
+            <div id="cont-especiales">
+                <div id="cant-turnoPass">3</div>
+                <div></div>
+                <div></div>
+            </div>
             <div id="movimientos" class="movimientos">
                 <!-- Movimientos generados se insertarán aquí -->
             </div>

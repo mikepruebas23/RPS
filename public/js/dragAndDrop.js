@@ -68,7 +68,7 @@ export function initializeDragAndDrop(options = { 'disabled': true}) {
     // Evento de clic para mover elementos
     function agregarEventoClick(contenedor, destino) {
       contenedor.addEventListener("click", (event) => {
-        const elemento = event.target.closest(".movimiento");
+        const elemento = event.target.closest(".naipe");
         if (elemento) {
           if(!tableroBloqueado){
             moverElemento(elemento, destino);
@@ -82,6 +82,55 @@ export function initializeDragAndDrop(options = { 'disabled': true}) {
     agregarEventoClick(tableroMio, movimientosContainer);
   }
 }
+
+// export function initializeDragAndDrop_Respaldo(options = { 'disabled': true}) {
+//   const movimientosContainer = document.getElementById('movimientos');
+//   const tableroMio = document.getElementById('tablero-mio');
+
+//   if (movimientosContainer && tableroMio) {
+//     // Inicializar SortableJS
+//     const movimientosSortable = Sortable.create(movimientosContainer, {
+//       group: 'compartido',
+//       animation: 150,
+//       ...options,
+//     });
+
+//     const tableroMioSortable = Sortable.create(tableroMio, {
+//       group: 'compartido',
+//       animation: 150,
+//       ...options,
+//       onAdd: (event) => {
+//         if (tableroMio.children.length > 2) {
+//           event.from.appendChild(event.item);
+//         }
+//       },
+//     });
+
+//     sortableInstances = [movimientosSortable, tableroMioSortable];
+
+//     // Función para mover el elemento al otro contenedor
+//     function moverElemento(elemento, destino) {
+//       if (destino === tableroMio && tableroMio.children.length >= 2) return;
+//       destino.appendChild(elemento);
+//     }
+
+//     // Evento de clic para mover elementos
+//     function agregarEventoClick(contenedor, destino) {
+//       contenedor.addEventListener("click", (event) => {
+//         const elemento = event.target.closest(".movimiento");
+//         if (elemento) {
+//           if(!tableroBloqueado){
+//             moverElemento(elemento, destino);
+//           }
+//         }
+//       });
+//     }
+
+//     // Agregar eventos de clic
+//     agregarEventoClick(movimientosContainer, tableroMio);
+//     agregarEventoClick(tableroMio, movimientosContainer);
+//   }
+// }
 
 
 export function toggleDragAndDrop(enable) {

@@ -6,6 +6,7 @@ const contLogo = document.getElementById('cont-logo');
 const contBienvenido = document.getElementById('bienvenido');
 const contGuardarnombre = document.getElementById('cont-guardarnombre');
 const contHeader = document.getElementById('header');
+const turnoLeft = document.getElementById("cant-turnoPass");
 const contTablero = document.getElementById('cont-tablero');
 const contTemporizador = document.getElementById('cont-temporizador');
 const controlesIniciales = document.getElementById('controles-iniciales');
@@ -106,6 +107,7 @@ export function actualizarEstadoPartida(estatus, idJugador = null, resultado = n
     break;
     case ESTATUS_JUEGO.MOSTRAR_PUNTOS:
       _renderPuntuacionesRonda(idJugador, resultado);
+      _renderTurnosRestantes(idJugador, resultado);
     break;
     case ESTATUS_JUEGO.DESCONECTADO: 
       bloquearBtnListo(true);
@@ -141,7 +143,7 @@ export function actualizarEstatusTablero(estatus, movimientos = null){
       uiLimpiarTablero('tablero-opo');
     break;
     case ESTATUS_TABLERO.OPO_LISTO:
-      uiLimpiarTablero('tablero-opo');
+      // uiLimpiarTablero('tablero-opo');
       uiActualizarMovimientosOponente(movimientos);
     break;
     case ESTATUS_TABLERO.OPO_LISTO_AUTO:
@@ -163,6 +165,23 @@ export function actualizarEstatusTablero(estatus, movimientos = null){
 }
 
 function uiActualizarMovimientosOponente(movimientos) {
+
+  uiLimpiarTablero('tablero-opo');
+
+  const tabOponente = document.getElementById('tablero-opo');
+
+  // Iterar sobre los movimientos y agregar cada uno al tablero
+  movimientos.forEach((movimiento) => {
+    const img = document.createElement('img');
+    img.src = "./images/naipe2.png";
+    img.alt = movimiento.valor;
+    img.classList.add('img-card', 'naipe');
+
+    tabOponente.appendChild(img);
+  });
+}
+
+function uiActualizarMovimientosOponente_Respaldo(movimientos) {
 
   uiLimpiarTablero('tablero-opo');
 
@@ -243,21 +262,21 @@ function _MostrarMensaje(elemento, mensaje){
 };
 
 export function actualizarListaDeSalas(salas) {
-  const tituloSalas = document.getElementById('titulo-listado');
   const contenedorSalas = document.getElementById('contenedor-sala');
   
-  console.log(salas);
+  // console.log(salas);
   if (salas.length === 0) {
     contenedorSalas.innerHTML = '<p id="titulo-listado">Ninguna</p>';
   } else {
     contenedorSalas.innerHTML = '';
+    
     salas.forEach(({ codigo, usuarios }) => {
+
       const salaItems = document.createElement('div');
-      
       const salaItem = document.createElement('p');
       const btnUnirse = document.createElement('button');
-      if(usuarios < 2){
-        
+
+      if(usuarios === 1){ 
         btnUnirse.textContent = 'unirse';
         btnUnirse.classList.add('btn-unirse');
         salaItems.classList.add('contenedor-sala-items');
@@ -268,15 +287,25 @@ export function actualizarListaDeSalas(salas) {
         salaItems.appendChild(btnUnirse);
         contenedorSalas.appendChild(salaItems);
       }
-      else {
-        contenedorSalas.innerHTML = '<p id="titulo-listado">En partida</p>';
-      }
-      
     });
   }
 }
   
 export function actualizarMovimientos(movimientos) {
+  const contenedorMovimientos = document.getElementById('movimientos');
+  if (contenedorMovimientos) {
+    // Meter los movimientos en su imagen correspondiente.
+    contenedorMovimientos.innerHTML = movimientos
+      .map((movimiento) => `<img src="${movimiento.url}" class="img-card naipe" alt="${movimiento.valor}" />`)
+      .join('');
+      
+    initializeDragAndDrop();
+  } else {
+    console.error('Elemento movimientos no encontrado.');
+  }
+}
+
+export function actualizarMovimientos_Respaldo(movimientos) {
   const contenedorMovimientos = document.getElementById('movimientos');
   if (contenedorMovimientos) {
     // Meter los movimientos en su imagen correspondiente.
@@ -300,8 +329,6 @@ function _renderPuntuacionesRonda(idJugador, resultado){
 
   nombre1.textContent = localStorage.getItem('flip43_tagname') || 'Tú';
   nombre2.textContent = 'Oponente';
-
-  // console.log(idJugador, resultado);
   
   for(let res of resultado){
     if(idJugador === res.idJugador){
@@ -313,6 +340,11 @@ function _renderPuntuacionesRonda(idJugador, resultado){
       resultado2.textContent = pj2Puntos;
     }
   }
+}
+
+function _renderTurnosRestantes(idJugador, resultado) {
+  const jugador = resultado.find(res => res.idJugador === idJugador);
+  turnoLeft.innerHTML = jugador.turnos;
 }
 
 export function bloquearBtnListo(bOpcion){

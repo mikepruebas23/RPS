@@ -5,6 +5,3 @@ meter alguna validaicon para que los penalice o les de dq.
 
 # Subir mas de altura la pantalla final
 # Mandar mensaje al jugador cuando ya no tienes movimientos y solo estas en espera de que tu oponente ponga algo.
-
-# Si el usuario se desconecta.
-se manda directo a pantalla de dq, falta eliminar la sala.

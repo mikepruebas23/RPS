@@ -13,11 +13,15 @@ const timers = {};
 const movimientosPorSala = {};
 
 // Función para emitir el estado de las salas a todos los clientes
+
 function actualizarSalas() {
-  const estadoSalas = Object.entries(salas).map(([codigo, data]) => ({
-    codigo,
-    usuarios: data.jugadores.length,
-  }));
+  const estadoSalas = Object.entries(salas)
+    .filter(([_, data]) => data.jugadores.length === 1) // Filtrar solo salas con 1 jugador
+    .map(([codigo, data]) => ({
+      codigo,
+      usuarios: data.jugadores.length,
+    }));
+
   io.emit('actualizarSalas', estadoSalas);
 }
 
@@ -45,9 +49,29 @@ function iniciarTemporizadorSala(codigoSala) {
       const { jugadores } = salas[codigoSala];
       const [jugador1Id, jugador2Id] = jugadores;
 
+    //  const iTurnoPass1 = salas[codigoSala].turnoPass[jugador1Id];
+    //  const iTurnoPass2 = salas[codigoSala].turnoPass[jugador2Id];
+      
+
       // ejemplo : [7, 3, 0, 9, 1, 6, 4, 2, 8, 5]
-      const movimientosJugador1 = generarMovimientosTablero();
-      const movimientosJugador2 = generarMovimientosTablero();
+      // Movimiento Nuevos:  objeto = [{ valor:1 img: "./images/naipe.png"]}
+      const objeto = [
+        { valor:0, url: "./images/naipe.png"},
+        { valor:1, url: "./images/naipe.png"},
+        { valor:2, url: "./images/naipe.png"},
+        { valor:3, url: "./images/naipe.png"},
+        { valor:4, url: "./images/naipe.png"},
+        { valor:5, url: "./images/naipe.png"},
+        { valor:6, url: "./images/naipe.png"},
+        { valor:7, url: "./images/naipe.png"},
+        { valor:8, url: "./images/naipe.png"},
+        { valor:9, url: "./images/naipe.png"},
+      ];
+      // const movimientosJugador1 = generarMovimientosTablero();
+      // const movimientosJugador2 = generarMovimientosTablero();
+
+      const movimientosJugador1 = objeto;
+      const movimientosJugador2 = objeto;
 
       // Emitir los movimientos a cada jugador
       io.to(jugador1Id).emit('recibirMovimientos', movimientosJugador1);
@@ -61,7 +85,7 @@ function generarMovimientosTablero() {
   return Array.from({ length: 10 }, (_, index) => index); // en orden
 }
 
-function analizarMovimientos(movimientos, jugadores, puntos) {
+function analizarMovimientos(movimientos, jugadores, puntos, turnos) {
 
   const movimientosConcatenados = Object.keys(movimientos).reduce((acc, jugadorId) => {
     const valorConcatenado = `${movimientos[jugadorId][0]}${movimientos[jugadorId][1]}`;
@@ -76,6 +100,9 @@ function analizarMovimientos(movimientos, jugadores, puntos) {
 
   const valorJugador1 = movimientosConcatenados[jugador1] || 0;
   const valorJugador2 = movimientosConcatenados[jugador2] || 0;
+
+  if(valorJugador1 === 0){turnos[jugador1] -= 1 }
+  if(valorJugador2 === 0){turnos[jugador2] -= 1 }
 
   // Diferencia entre los dos valores
   const diferencia = Math.abs(valorJugador1 - valorJugador2);
@@ -93,6 +120,7 @@ function analizarMovimientos(movimientos, jugadores, puntos) {
   return jugadores.map(jugadorId => ({
     idJugador: jugadorId,
     puntos: puntos[jugadorId],
+    turnos: turnos[jugadorId]
   }));
 }
 
@@ -106,10 +134,7 @@ io.on('connection', (socket) => {
 
   // Enviar la lista actual de salas al cliente si lo solicita
   socket.on('obtenerSalas', () => {
-    socket.emit('actualizarSalas', Object.entries(salas).map(([codigo, data]) => ({
-      codigo,
-      usuarios: data.jugadores.length,
-    })));
+    actualizarSalas();
   });
 
   // Crear Sala
@@ -119,6 +144,7 @@ io.on('connection', (socket) => {
       jugadores: [socket.id],
       puntos: { [socket.id]: 0 },
       cantMov: { [socket.id]: 10 },
+      turnoPass: { [socket.id]: 3 },
       estatus: 'esperando'
     };
     socket.join(codigo);
@@ -133,11 +159,11 @@ io.on('connection', (socket) => {
         salas[codigo].jugadores.push(socket.id);
         salas[codigo].puntos[socket.id] = 0;
         salas[codigo].cantMov[socket.id] = 10;
+        salas[codigo].turnoPass[socket.id] = 3;
         socket.join(codigo);
 
         if (salas[codigo].jugadores.length === 2) {
           salas[codigo].estatus = '';
-          // console.log("salas: ",salas[codigo]);
           io.to(codigo).emit('salaLista', {codigo, jugadores: salas[codigo].jugadores});
           iniciarTemporizadorSala(codigo);
         }
@@ -167,13 +193,11 @@ io.on('connection', (socket) => {
 
     // Almacenar los movimientos del jugador
     movimientosPorSala[codigoSala][socket.id] = movimientos;
-
-    // Verificar si ambos jugadores han enviado sus movimientos
-    const { jugadores, puntos, cantMov } = salas[codigoSala];
+    const { jugadores, puntos, cantMov, turnoPass } = salas[codigoSala];
     cantMov[socket.id] = cantMovimientos;
 
     if (movimientosPorSala[codigoSala][jugadores[0]] && movimientosPorSala[codigoSala][jugadores[1]]) {
-      const resultado = analizarMovimientos(movimientosPorSala[codigoSala], jugadores, puntos);
+      const resultado = analizarMovimientos(movimientosPorSala[codigoSala], jugadores, puntos, turnoPass);
 
       io.to(codigoSala).emit('serverEmit_RondaLista', movimientosPorSala[codigoSala], resultado, cantMov);
 
@@ -195,8 +219,6 @@ io.on('connection', (socket) => {
     // console.log(`Usuario desconectado: ${socket.id}`);
   
     for (const codigo in salas) {
-      // console.log("codigo: ",codigo);
-      console.log("salas: ",salas);
       // Filtrar jugadores y eliminar al desconectado
       salas[codigo].jugadores = salas[codigo].jugadores.filter(id => id !== socket.id);
   

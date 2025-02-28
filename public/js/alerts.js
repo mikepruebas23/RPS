@@ -49,3 +49,5 @@ export function alert_mensaje(mensaje){
         draggable: true
       });
 }
+
+document.getElementById("btn-guardar-nombre").addEventListener("click", guardarNombre);
