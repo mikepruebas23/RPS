@@ -56,15 +56,15 @@ function iniciarTemporizadorSala(codigoSala) {
       // ejemplo : [7, 3, 0, 9, 1, 6, 4, 2, 8, 5]
       // Movimiento Nuevos:  objeto = [{ valor:1 img: "./images/naipe.png"]}
       const objeto = [
-        { valor:0, url: "./images/naipe.png"},
-        { valor:1, url: "./images/naipe.png"},
-        { valor:2, url: "./images/naipe.png"},
-        { valor:3, url: "./images/naipe.png"},
-        { valor:4, url: "./images/naipe.png"},
-        { valor:5, url: "./images/naipe.png"},
-        { valor:6, url: "./images/naipe.png"},
-        { valor:7, url: "./images/naipe.png"},
-        { valor:8, url: "./images/naipe.png"},
+        { valor:0, url: "./images/naipe_7.png"},
+        { valor:1, url: "./images/naipe_7.png"},
+        { valor:2, url: "./images/naipe_7.png"},
+        { valor:3, url: "./images/naipe_7.png"},
+        { valor:4, url: "./images/naipe_7.png"},
+        { valor:5, url: "./images/naipe_7.png"},
+        { valor:6, url: "./images/naipe_7.png"},
+        { valor:7, url: "./images/naipe_7.png"},
+        { valor:8, url: "./images/naipe_8.png"},
         { valor:9, url: "./images/naipe.png"},
       ];
       // const movimientosJugador1 = generarMovimientosTablero();
