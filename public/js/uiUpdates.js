@@ -173,7 +173,7 @@ function uiActualizarMovimientosOponente(movimientos) {
   // Iterar sobre los movimientos y agregar cada uno al tablero
   movimientos.forEach((movimiento) => {
     const img = document.createElement('img');
-    img.src = "./images/naipe2.png";
+    img.src = "./images/naipeEspalda1.png";
     img.alt = movimiento.valor;
     img.classList.add('img-card', 'naipe');
 
@@ -344,7 +344,7 @@ function _renderPuntuacionesRonda(idJugador, resultado){
 
 function _renderTurnosRestantes(idJugador, resultado) {
   const jugador = resultado.find(res => res.idJugador === idJugador);
-  turnoLeft.innerHTML = jugador.turnos;
+  turnoLeft.innerHTML = (jugador.turnos <=0) ? 0 : jugador.turnos;
 }
 
 export function bloquearBtnListo(bOpcion){

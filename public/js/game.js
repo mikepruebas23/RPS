@@ -114,8 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const {valorTurno} = obtenerValorDelTurno();
     const {valoresTablero, valoresMovimientos} = obtenerMovimientosTablero();
-    console.log(valoresMovimientos);
-    if(valorTurno >= 1){
+
+    console.log(valorTurno);
+    if(valorTurno > 0){
       if (valoresTablero) {
         // enviar mensaje y mano para el oponente.
         socket.emit('gameEmit_movimientoListo', {

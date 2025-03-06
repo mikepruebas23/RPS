@@ -14,7 +14,11 @@ body {
   text-align: center;
   margin: 0;
   padding: 0;
-  background: var(--color-fondo);
+  /* background: var(--color-fondo); */
+  background: #32333b;
+  /* background-image: url('../images/fondo_celular.jpg'); */
+  /* background-size: contain; */
+  /* background-repeat: repeat; */
 }
 
 button {
